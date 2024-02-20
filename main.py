@@ -1,16 +1,69 @@
-# This is a sample Python script.
+from turtle import Screen
+from snake import Snake
+from food import Food
+from scoreboard import Scoreboard
+import time
+import random
+import pygame
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+# Define the game constants
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
+SNAKE_SIZE = 10
+FOOD_SIZE = 10
+
+# Define the colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+screen = Screen()
+screen.setup(width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
+screen.bgcolor(BLACK)
+screen.title("Snake Game")
+screen.tracer(0)
+
+snake = Snake()
+food = Food()
+# newFood = Food()
+scoreboard = Scoreboard()
+
+screen.listen()
+screen.onkey(snake.up, "Up")
+screen.onkey(snake.down, "Down")
+screen.onkey(snake.left, "Left")
+screen.onkey(snake.right, "Right")
+
+gameOn = True
+while gameOn:
+    screen.update()
+    time.sleep(0.1)
+
+    snake.move()
+
+    # Check if snake is eating food
+    if snake.head.distance(food) < 15:
+        food.create_food_random_color_random_location()
+        snake.extend()
+        scoreboard.increase_score()
+
+    if snake.head.xcor() > 290 or snake.head.xcor() < -290 or snake.head.ycor() > 290 or snake.head.ycor() < -290:
+        gameOn = False
+        scoreboard.game_over()
+
+    # Detect collision with tail
+    for segment in snake.segments:
+        if segment == snake.head:
+            pass
+        elif snake.head.distance(segment) < 10:
+            gameOn = False
+            scoreboard.game_over()
+
+    # Detect if snake is eating old food
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+screen.exitonclick()
