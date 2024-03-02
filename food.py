@@ -10,7 +10,7 @@ class Food(Turtle):
     def __init__(self):
         super().__init__()
         self.all_foods = []
-        self.create_food_rcandom_color_random_location()
+        self.create_food_random_color_random_location()
 
     def create_food(self):
         for position in STARTING_POSITIONS:
