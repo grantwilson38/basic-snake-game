@@ -2,9 +2,6 @@ import pygame
 from enemy_snake import EnemySnake
 import random
 
-ALIGNMENT = "center"
-FONT = ("Arial", 24)
-
 class Scoreboard:
 
     def __init__(self, snake):
@@ -21,7 +18,7 @@ class Scoreboard:
         self.score += 1
         if self.score % 2 == 0:
             # Increase speed based on score
-            new_speed = 0.05 + self.score 
+            new_speed = 0.05 + (self.score * 0.01)
 
             # Ensure new_speed is not zero
             if new_speed == 0:

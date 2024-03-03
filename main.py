@@ -1,4 +1,3 @@
-from turtle import Screen
 from snake import Snake, STARTING_POSITIONS
 from food import Food
 from scoreboard import Scoreboard
@@ -10,12 +9,14 @@ import time
 
 import pygame
 from pygame.locals import QUIT, KEYDOWN, K_UP, K_DOWN, K_LEFT, K_RIGHT
-pygame.init()
 
 import winsound
 
 game_over_sound = pygame.mixer.Sound("game_over.wav")
 game_start_sound = pygame.mixer.Sound("game_start.wav")
+pellet_eat_sound = pygame.mixer.Sound("pellet_eat.wav")
+
+pygame.init()
 
 # Define the game constants
 SCREEN_WIDTH = 600
@@ -55,6 +56,9 @@ food = Food(RED, FOOD_SIZE, FOOD_SIZE)
 # Create the scoreboard
 scoreboard = Scoreboard(snake)
 
+# Create a clock object
+clock = pygame.time.Clock()
+
 # Game loop
 running = True
 while running:
@@ -71,35 +75,39 @@ while running:
             elif event.key == K_RIGHT:
                 snake.right()
 
-    # Update the snake and food
-    snake.update(SCREEN_WIDTH, SCREEN_HEIGHT)
-    food.update(snake)
-
     # Draw the snake and food
     snake.draw(screen)
     food.draw(screen)
+    
+    # Update the snake and food
+    snake.update(SCREEN_WIDTH, SCREEN_HEIGHT)
+    food.update(snake)
 
     # Check for collisions between the snake and the food
     if pygame.sprite.spritecollide(snake.head, pygame.sprite.GroupSingle(food), False):
         food.create_food_random_color_random_location()
         snake.extend()
         scoreboard.increase_score()
-        # Play sound
+        # Play pellet_eat.wav
+        pellet_eat_sound.play()
 
     # Check for collisions with the screen boundaries
     if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \
         snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
          running = False
-         # Game over
+         game_over_sound.play()
 
     # Check for collisions with the snake's tail
     flat_segments = list(snake.segments.sprites())[1:] # Exclude the head    
     if pygame.sprite.spritecollide(snake.head, pygame.sprite.Group(*flat_segments), False):
         running = False
-        # Game over
+        game_over_sound.play()
 
     # Update the display
     pygame.display.flip()
+
+    # Control the frame rate
+    clock.tick(60)
 
 # Quit Pygame
 pygame.quit()
