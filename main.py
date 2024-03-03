@@ -42,7 +42,7 @@ game_start_sound.play()
 time.sleep(2)
 
 # Create the player's snake, food, and scoreboard
-snake = Snake(speed=0.1)
+snake = Snake(speed=0.01)
 food = Food()
 scoreboard = Scoreboard(snake)
 
@@ -59,8 +59,7 @@ counter = 0
 
 while gameOn:
     screen.update()
-    time.sleep(snake.speed)
-
+    time.sleep(0.1)
     snake.move()
 
     # Detect collision with food for player's snake
@@ -91,10 +90,8 @@ while gameOn:
         game_over_sound.play()
 
     # Detect collision with tail
-    for segment in snake.segments:
-        if segment == snake.head:
-            pass
-        elif snake.head.distance(segment) < 10:
+    for segment in snake.segments[4:]:
+        if snake.head.distance(segment) < 10:
             gameOn = False
             scoreboard.game_over()
             game_over_sound.play()

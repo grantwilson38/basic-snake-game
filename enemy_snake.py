@@ -30,6 +30,13 @@ class EnemySnake(Snake):
         enemy_spawn.play()
 
     def move(self, player_snake, food, enemy_snakes):
+        # Move each segment to the position of the segment ahead of it
+        for seg_num in range(len(self.segments) - 1, 0, -1):
+            new_x = self.segments[seg_num - 1].xcor()
+            new_y = self.segments[seg_num - 1].ycor()
+            self.segments[seg_num].goto(new_x, new_y)
+
+        # Move the head of the snake based on the behavior
         if self.behavior == "chase_player":
             self.move_towards(player_snake.head)
         elif self.behavior == "chase_food":
