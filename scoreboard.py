@@ -17,9 +17,9 @@ class Scoreboard(Turtle):
     def __init__(self, snake):
         super().__init__()
         self.score = 0
-        self.enemy_snakes = []
         self.snake = snake
-        
+        self.enemy_snakes = []
+                
         self.color("white")
         self.penup()
         self.goto(0, 260)
@@ -33,7 +33,7 @@ class Scoreboard(Turtle):
     def increase_score(self):
         self.score += 1
         if self.score % 2 == 0:
-            new_enemy_snake = Snake("red", speed=0.05)
+            new_enemy_snake = Snake("red", speed=0.02)
             while new_enemy_snake.head.distance(self.snake.head) < 50:  # Ensure the enemy snake is not too close
                 new_enemy_snake = Snake("red", speed=0.02)
             self.enemy_snakes.append(new_enemy_snake)
