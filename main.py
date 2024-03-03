@@ -50,7 +50,7 @@ game_start_sound.play()
 time.sleep(2)
 
 # Create the snake and food sprites and add them to their respective groups
-snake = Snake(GREEN, 0.01)
+snake = Snake()
 food = Food(RED, FOOD_SIZE, FOOD_SIZE)
 
 # Create the scoreboard
