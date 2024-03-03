@@ -13,8 +13,6 @@ import winsound
 game_over_sound = pygame.mixer.Sound("game_over.wav")
 game_start_sound = pygame.mixer.Sound("game_start.wav")
 
-
-
 # Define the game constants
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
