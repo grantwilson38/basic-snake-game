@@ -27,9 +27,19 @@ class Snake:
         x_diff = food.xcor() - self.head.xcor()
         y_diff = food.ycor() - self.head.ycor()
 
-        angle = math.atan2(y_diff, x_diff)
+        if abs(x_diff) > abs(y_diff):
+            # Move horizontally
+            if x_diff > 0:
+                self.head.setheading(RIGHT)
+            else:
+                self.head.setheading(LEFT)
+        else:
+            # Move vertically
+            if y_diff > 0:
+                self.head.setheading(UP)
+            else:
+                self.head.setheading(DOWN)
 
-        self.head.setheading(math.degrees(angle))
         self.move()
 
     def add_segment(self, position, color="white"):
@@ -40,7 +50,7 @@ class Snake:
         self.segments.append(new_segment)
 
     def extend(self):
-        self.add_segment(self.segments[-1].position())
+        self.add_segment(self.segments[-1].position(), self.color)
 
     def move(self):
         for seg_num in range(len(self.segments) - 1, 0, -1):

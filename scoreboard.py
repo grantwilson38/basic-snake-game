@@ -35,7 +35,7 @@ class Scoreboard(Turtle):
         if self.score % 2 == 0:
             new_enemy_snake = Snake("red", speed=0.05)
             while new_enemy_snake.head.distance(self.snake.head) < 50:  # Ensure the enemy snake is not too close
-                new_enemy_snake = Snake("red", speed=0.025)
+                new_enemy_snake = Snake("red", speed=0.02)
             self.enemy_snakes.append(new_enemy_snake)
             enemy_spawn.play()
 

@@ -76,6 +76,7 @@ while gameOn:
     # Move enemy snakes and check for collision
     for enemy_snake in scoreboard.enemy_snakes:
         enemy_snake.move_towards_food(food)
+        time.sleep(enemy_snake.speed)
         if snake.head.distance(enemy_snake.head) < 10:
             gameOn = False
             game_over_sound.play()
