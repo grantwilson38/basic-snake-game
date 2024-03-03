@@ -14,28 +14,21 @@ class EnemySnake(Snake):
         super().__init__(color, speed)
         self.behavior = behavior
 
+        # Initialize some body segments for the enemy snake
+        self.add_segment(self.head.position())
+        for _ in range(3):
+            self.add_segment(self.segments[-1].position())
+
         # Set the head's position to a random point within the screen boundaries
         self.head.goto(random.randint(-280, 280), random.randint(-280, 280))
-
-        # Move all body segments to the position of the head
-        for segment in self.segments:
-            segment.goto(self.head.position())
 
         # Ensure the enemy snake is not too close to the player's snake
         while self.head.distance(player_snake.head) < 50:
             self.head.goto(random.randint(-280, 280), random.randint(-280, 280))
-            for segment in self.segments:
-                segment.goto(self.head.position())
 
         enemy_spawn.play()
 
     def move(self, player_snake, food, enemy_snakes):
-        # Move each segment to the position of the segment ahead of it
-        for seg_num in range(len(self.segments) - 1, 0, -1):
-            new_x = self.segments[seg_num - 1].xcor()
-            new_y = self.segments[seg_num - 1].ycor()
-            self.segments[seg_num].goto(new_x, new_y)
-
         # Move the head of the snake based on the behavior
         if self.behavior == "chase_player":
             self.move_towards(player_snake.head)
@@ -46,6 +39,14 @@ class EnemySnake(Snake):
         elif self.behavior == "chase_enemy":
             closest_enemy = min(enemy_snakes, key=lambda snake: self.head.distance(snake.head))
             self.move_towards(closest_enemy.head)
+
+        # Move each segment to the position of the segment ahead of it
+        for seg_num in range(len(self.segments) - 1, 0, -1):
+            self.segments[seg_num].goto(self.segments[seg_num - 1].xcor(), self.segments[seg_num - 1].ycor())
+
+        # Move the first segment to the position of the head
+        if len(self.segments) > 0:
+            self.segments[0].goto(self.head.xcor(), self.head.ycor())
 
     def move_towards(self, target):
         # Check if target has xcor and ycor attributes
@@ -61,6 +62,22 @@ class EnemySnake(Snake):
 
     def move_randomly(self):
         # Set a random heading
-        self.head.setheading(random.randint(0, 360))
+        new_heading = random.randint(0, 360)
+        self.head.setheading(new_heading)
+
+        # Check if the new heading would cause the snake to hit itself
+        if len(self.segments) > 0:
+            dx = self.segments[0].xcor() - self.head.xcor()
+            dy = self.segments[0].ycor() - self.head.ycor()
+            distance = math.sqrt(dx * dx + dy * dy)
+
+            # If the new heading would cause the snake to hit itself, choose a new heading
+            while distance < 20:
+                new_heading = random.randint(0, 360)
+                self.head.setheading(new_heading)
+                dx = self.segments[0].xcor() - self.head.xcor()
+                dy = self.segments[0].ycor() - self.head.ycor()
+                distance = math.sqrt(dx * dx + dy * dy)
+
         # Move the snake forward
         self.head.forward(self.speed)

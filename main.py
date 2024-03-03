@@ -13,8 +13,6 @@ import winsound
 game_over_sound = pygame.mixer.Sound("game_over.wav")
 game_start_sound = pygame.mixer.Sound("game_start.wav")
 
-
-
 # Define the game constants
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
@@ -103,5 +101,15 @@ while gameOn:
                 gameOn = False
                 scoreboard.game_over()
                 game_over_sound.play()
+
+    # Check for head-on collision between enemy snakes
+    for i in range(len(scoreboard.enemy_snakes)):
+        for j in range(i + 1, len(scoreboard.enemy_snakes)):
+            if scoreboard.enemy_snakes[i].head.distance(scoreboard.enemy_snakes[j].head) < 10:
+                # Remove the collided snakes from the game
+                scoreboard.enemy_snakes[i].reset()
+                scoreboard.enemy_snakes[j].reset()
+                scoreboard.enemy_snakes = [snake for snake in scoreboard.enemy_snakes if snake != scoreboard.enemy_snakes[i] and snake != scoreboard.enemy_snakes[j]]
+                break
 
 screen.exitonclick()
