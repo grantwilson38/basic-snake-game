@@ -54,6 +54,9 @@ screen.onkey(snake.left, "Left")
 screen.onkey(snake.right, "Right")
 
 gameOn = True
+
+counter = 0
+
 while gameOn:
     screen.update()
     time.sleep(snake.speed)
@@ -75,11 +78,12 @@ while gameOn:
 
     # Move enemy snakes and check for collision
     for enemy_snake in scoreboard.enemy_snakes:
-        enemy_snake.move_towards_food(food)
-        time.sleep(enemy_snake.speed)
+        enemy_snake.move(snake, food, scoreboard.enemy_snakes)
         if snake.head.distance(enemy_snake.head) < 10:
             gameOn = False
             game_over_sound.play()
+
+    counter += 1
 
     if snake.head.xcor() > 290 or snake.head.xcor() < -290 or snake.head.ycor() > 290 or snake.head.ycor() < -290:
         gameOn = False
