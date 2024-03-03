@@ -1,27 +1,21 @@
-from turtle import Turtle
+import pygame
 from enemy_snake import EnemySnake
 import random
 
 ALIGNMENT = "center"
-FONT = ("Arial", 24, "normal")
+FONT = ("Arial", 24)
 
-class Scoreboard(Turtle):
+class Scoreboard:
 
     def __init__(self, snake):
-        super().__init__()
         self.score = 1
         self.snake = snake
         self.enemy_snakes = []
-                
-        self.color("white")
-        self.penup()
-        self.goto(0, 260)
-        self.hideturtle()
-        self.update_scoreboard()
+        self.font = pygame.font.Font(pygame.font.match_font('arial'), 24)
 
-    def update_scoreboard(self):
-        self.clear()
-        self.write(f"Score: {self.score}", align=ALIGNMENT, font=FONT)
+    def draw_scoreboard(self, screen):
+        score_surface = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+        screen.blit(score_surface, (0, 0))
 
     def increase_score(self):
         self.score += 1
@@ -43,8 +37,6 @@ class Scoreboard(Turtle):
             new_enemy_snake = EnemySnake("red", new_speed, self.snake, behavior=behavior)
             self.enemy_snakes.append(new_enemy_snake)
 
-        self.update_scoreboard()
-
-    def game_over(self):
-        self.goto(0,0)
-        self.write("GAME OVER", align=ALIGNMENT,font=FONT)
+    def game_over(self, screen):
+        game_over_surface = self.font.render("GAME OVER", True, (255, 255, 255))
+        screen.blit(game_over_surface, (0, 0))

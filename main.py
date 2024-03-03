@@ -1,13 +1,17 @@
 from turtle import Screen
-from snake import Snake
+from snake import Snake, STARTING_POSITIONS
 from food import Food
 from scoreboard import Scoreboard
-import time
-import random
-import pygame
-import math
 
-from snake import Snake, STARTING_POSITIONS
+import math
+import random
+import sys
+import time
+
+import pygame
+from pygame.locals import QUIT, KEYDOWN, K_UP, K_DOWN, K_LEFT, K_RIGHT
+pygame.init()
+
 import winsound
 
 game_over_sound = pygame.mixer.Sound("game_over.wav")
@@ -26,12 +30,17 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-# Initialize the screen
-screen = Screen()
-screen.setup(width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
-screen.bgcolor(BLACK)
-screen.title("Snake Game")
-screen.tracer(0)
+# Create the screen
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Set the window title
+pygame.display.set_caption("Snake Game")
+
+# Set the background color
+screen.fill(BLACK)
+
+# Update the display
+pygame.display.flip()
 
 # Play the game start sound
 game_start_sound.play()
@@ -39,77 +48,59 @@ game_start_sound.play()
 # Pause the game for a few seconds
 time.sleep(2)
 
-# Create the player's snake, food, and scoreboard
-snake = Snake(speed=0.01)
-food = Food()
+# Create the snake and food sprites and add them to their respective groups
+snake = Snake(GREEN, 0.01)
+food = Food(RED, FOOD_SIZE, FOOD_SIZE)
+
+# Create the scoreboard
 scoreboard = Scoreboard(snake)
 
-# Listen for key presses
-screen.listen()
-screen.onkey(snake.up, "Up")
-screen.onkey(snake.down, "Down")
-screen.onkey(snake.left, "Left")
-screen.onkey(snake.right, "Right")
+# Game loop
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            running = False
+        elif event.type == KEYDOWN:
+            if event.key == K_UP:
+                snake.up()
+            elif event.key == K_DOWN:
+                snake.down()
+            elif event.key == K_LEFT:
+                snake.left()
+            elif event.key == K_RIGHT:
+                snake.right()
 
-gameOn = True
+    # Update the snake and food
+    snake.update(SCREEN_WIDTH, SCREEN_HEIGHT)
+    food.update(snake)
 
-counter = 0
+    # Draw the snake and food
+    snake.draw(screen)
+    food.draw(screen)
 
-while gameOn:
-    screen.update()
-    time.sleep(0.1)
-    snake.move()
-
-    # Detect collision with food for player's snake
-    if snake.head.distance(food) < 15:
+    # Check for collisions between the snake and the food
+    if pygame.sprite.spritecollide(snake.head, pygame.sprite.GroupSingle(food), False):
         food.create_food_random_color_random_location()
         snake.extend()
         scoreboard.increase_score()
-        winsound.PlaySound("pellet_eat.wav", winsound.SND_ASYNC)
+        # Play sound
 
-    # Detect collision with food for enemy snakes
-    for enemy_snake in scoreboard.enemy_snakes:
-        if enemy_snake.head.distance(food) < 15:
-            food.create_food_random_color_random_location()
-            enemy_snake.extend()
+    # Check for collisions with the screen boundaries
+    if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \
+        snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
+         running = False
+         # Game over
 
-    # Move enemy snakes and check for collision
-    for enemy_snake in scoreboard.enemy_snakes:
-        enemy_snake.move(snake, food, scoreboard.enemy_snakes)
-        if snake.head.distance(enemy_snake.head) < 10:
-            gameOn = False
-            game_over_sound.play()
+    # Check for collisions with the snake's tail
+    flat_segments = list(snake.segments.sprites())[1:] # Exclude the head    
+    if pygame.sprite.spritecollide(snake.head, pygame.sprite.Group(*flat_segments), False):
+        running = False
+        # Game over
 
-    counter += 1
+    # Update the display
+    pygame.display.flip()
 
-    if snake.head.xcor() > 290 or snake.head.xcor() < -290 or snake.head.ycor() > 290 or snake.head.ycor() < -290:
-        gameOn = False
-        scoreboard.game_over()
-        game_over_sound.play()
-
-    # Detect collision with tail
-    for segment in snake.segments[4:]:
-        if snake.head.distance(segment) < 10:
-            gameOn = False
-            scoreboard.game_over()
-            game_over_sound.play()
-
-    # Detect collision with enemy snake
-    for enemy_snake in scoreboard.enemy_snakes:
-        for segment in enemy_snake.segments:
-            if snake.head.distance(segment) < 10:
-                gameOn = False
-                scoreboard.game_over()
-                game_over_sound.play()
-
-    # Check for head-on collision between enemy snakes
-    for i in range(len(scoreboard.enemy_snakes)):
-        for j in range(i + 1, len(scoreboard.enemy_snakes)):
-            if scoreboard.enemy_snakes[i].head.distance(scoreboard.enemy_snakes[j].head) < 10:
-                # Remove the collided snakes from the game
-                scoreboard.enemy_snakes[i].reset()
-                scoreboard.enemy_snakes[j].reset()
-                scoreboard.enemy_snakes = [snake for snake in scoreboard.enemy_snakes if snake != scoreboard.enemy_snakes[i] and snake != scoreboard.enemy_snakes[j]]
-                break
-
-screen.exitonclick()
+# Quit Pygame
+pygame.quit()
+sys.exit()
