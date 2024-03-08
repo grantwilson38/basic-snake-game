@@ -1,7 +1,9 @@
 import pygame
 import math
 
-STARTING_POSITIONS = [(0, 0), (-20, 0), (-40, 0)]
+SNAKE_SIZE = 10
+
+STARTING_POSITIONS = [(x, 0) for x in range(0, -SNAKE_SIZE*3, -SNAKE_SIZE)]
 MOVE_DISTANCE = 20
 UP = (0, -MOVE_DISTANCE)
 DOWN = (0, MOVE_DISTANCE)

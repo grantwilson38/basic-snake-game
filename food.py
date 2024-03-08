@@ -3,6 +3,9 @@ import random
 
 STARTING_POSITIONS = [(50, 50)]
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]  # red, green, blue
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
+FOOD_SIZE = 10
 
 class Food(pygame.sprite.Sprite):
     def __init__(self, color, width, height):
@@ -17,13 +20,21 @@ class Food(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
     def update(self, snake):
-        if self.rect.colliderect(snake.rect):
-            self.rect.topleft = random.choice(STARTING_POSITIONS)
-            self.color = random.choice(COLORS)
-            self.image.fill(self.color)
-            snake.grow()
+        for segment in snake.segments:
+            if self.rect.colliderect(segment.rect):
+                self.rect.topleft = random.choice(STARTING_POSITIONS)
+                self.color = random.choice(COLORS)
+                self.image.fill(self.color)
+                snake.extend()
+                return True
+        return False
 
-    def create_new_food(self, position):
-        new_food = Food(self.color, self.rect.width, self.rect.height)
-        new_food.rect.topleft = position
-        return new_food
+    def create_new_food(self, position=None):
+        if position is None:
+            position = self.get_random_position()
+        self.rect.topleft = position
+        self.color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        self.image.fill(self.color)
+    
+    def get_random_position(self):
+        return (random.randint(0, SCREEN_WIDTH - FOOD_SIZE), random.randint(0, SCREEN_HEIGHT - FOOD_SIZE))

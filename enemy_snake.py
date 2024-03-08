@@ -17,7 +17,8 @@ enemy_spawn = pygame.mixer.Sound("enemy_spawn.mp3")
 
 class EnemySnake(Snake):
     def __init__(self, color, speed, player_snake, behavior):
-        super().__init__(color, speed)
+        super().__init__(color)
+        self.speed = speed
         self.behavior = behavior
         self.player_snake = player_snake
 
@@ -25,7 +26,7 @@ class EnemySnake(Snake):
         self.head.topleft = (random.randint(0, 560), random.randint(0, 560))
 
         # Ensure the enemy snake is not too close to the player's snake
-        while self.head.colliderect(player_snake.head):
+        while self.head.inflate(20, 20).colliderect(player_snake.head.inflate(20, 20)):
             self.head.topleft = (random.randint(0, 560), random.randint(0, 560))
 
         enemy_spawn.play()

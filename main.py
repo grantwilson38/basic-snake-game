@@ -85,7 +85,7 @@ while running:
 
     # Check for collisions between the snake and the food
     if pygame.sprite.spritecollide(snake.head, pygame.sprite.GroupSingle(food), False):
-        food.create_food_random_color_random_location()
+        food.create_new_food()
         snake.extend()
         scoreboard.increase_score()
         # Play pellet_eat.wav
@@ -107,7 +107,7 @@ while running:
     pygame.display.flip()
 
     # Control the frame rate
-    clock.tick(60)
+    clock.tick(10)
 
 # Quit Pygame
 pygame.quit()
