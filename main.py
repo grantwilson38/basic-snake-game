@@ -59,9 +59,22 @@ scoreboard = Scoreboard(snake)
 # Create a clock object
 clock = pygame.time.Clock()
 
+# Define a custom event for spawning enemy snakes
+SPAWN_ENEMY_SNAKE_EVENT = pygame.USEREVENT + 1
+
+# Set a timer for the custom event (e.g., every 1 second)
+pygame.time.set_timer(SPAWN_ENEMY_SNAKE_EVENT, 1000)
+
+# Create a list to hold the enemy snakes
+enemy_snakes = []
+
 # Game loop
 running = True
 while running:
+
+    # Clear the screen
+    screen.fill(BLACK)
+
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
@@ -80,16 +93,8 @@ while running:
     food.draw(screen)
     
     # Update the snake and food
-    snake.update(SCREEN_WIDTH, SCREEN_HEIGHT)
+    snake.update(SCREEN_WIDTH, SCREEN_HEIGHT, food)
     food.update(snake)
-
-    # Check for collisions between the snake and the food
-    if pygame.sprite.spritecollide(snake.head, pygame.sprite.GroupSingle(food), False):
-        food.create_new_food()
-        snake.extend()
-        scoreboard.increase_score()
-        # Play pellet_eat.wav
-        pellet_eat_sound.play()
 
     # Check for collisions with the screen boundaries
     if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \

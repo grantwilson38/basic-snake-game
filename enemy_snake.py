@@ -23,11 +23,11 @@ class EnemySnake(Snake):
         self.player_snake = player_snake
 
         # Set the head's position to a random point within the screen boundaries
-        self.head.topleft = (random.randint(0, 560), random.randint(0, 560))
+        self.head.rect.topleft = (random.randint(0, 560), random.randint(0, 560))
 
         # Ensure the enemy snake is not too close to the player's snake
-        while self.head.inflate(20, 20).colliderect(player_snake.head.inflate(20, 20)):
-            self.head.topleft = (random.randint(0, 560), random.randint(0, 560))
+        while self.head.rect.inflate(20, 20).colliderect(player_snake.head.rect.inflate(20, 20)):
+            self.head.rect.topleft = (random.randint(0, 560), random.randint(0, 560))
 
         enemy_spawn.play()
 
