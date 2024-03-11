@@ -1,22 +1,18 @@
-from snake import Snake, STARTING_POSITIONS
-from food import Food
-from scoreboard import Scoreboard
-
-import math
+import pygame
 import random
 import sys
 import time
 
-import pygame
-from pygame.locals import QUIT, KEYDOWN, K_UP, K_DOWN, K_LEFT, K_RIGHT
-
-import winsound
-
-game_over_sound = pygame.mixer.Sound("game_over.wav")
-game_start_sound = pygame.mixer.Sound("game_start.wav")
-pellet_eat_sound = pygame.mixer.Sound("pellet_eat.wav")
+from snake import Snake
+from food import Food
+from scoreboard import Scoreboard
+from enemy_snake import EnemySnake
+from events import PLAYER_EATS_FOOD
 
 pygame.init()
+
+# Define custom events
+PLAYER_EATS_FOOD = pygame.USEREVENT + 1
 
 # Define the game constants
 SCREEN_WIDTH = 600
@@ -26,22 +22,20 @@ FOOD_SIZE = 10
 
 # Define the colors
 BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
 RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+
+# Load sounds
+try:
+    game_over_sound = pygame.mixer.Sound("game_over.wav")
+    game_start_sound = pygame.mixer.Sound("game_start.wav")
+    pellet_eat_sound = pygame.mixer.Sound("pellet_eat.wav")
+except pygame.error as e:
+    print("Error loading sound files:", e)
+    sys.exit()
 
 # Create the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-# Set the window title
 pygame.display.set_caption("Snake Game")
-
-# Set the background color
-screen.fill(BLACK)
-
-# Update the display
-pygame.display.flip()
 
 # Play the game start sound
 game_start_sound.play()
@@ -49,71 +43,85 @@ game_start_sound.play()
 # Pause the game for a few seconds
 time.sleep(2)
 
-# Create the snake and food sprites and add them to their respective groups
+# Create the snake, food, and scoreboard
 snake = Snake()
 food = Food(RED, FOOD_SIZE, FOOD_SIZE)
-
-# Create the scoreboard
 scoreboard = Scoreboard(snake)
 
 # Create a clock object
 clock = pygame.time.Clock()
 
-# Define a custom event for spawning enemy snakes
-SPAWN_ENEMY_SNAKE_EVENT = pygame.USEREVENT + 1
-
-# Set a timer for the custom event (e.g., every 1 second)
-pygame.time.set_timer(SPAWN_ENEMY_SNAKE_EVENT, 1000)
-
-# Create a list to hold the enemy snakes
-enemy_snakes = []
-
 # Game loop
 running = True
 while running:
-
-    # Clear the screen
     screen.fill(BLACK)
 
+    enemy_snakes = []  # Define the enemy_snakes list
+
+    # Handle the events
     for event in pygame.event.get():
-        if event.type == QUIT:
-            running = False
-        elif event.type == KEYDOWN:
-            if event.key == K_UP:
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
                 snake.up()
-            elif event.key == K_DOWN:
+            elif event.key == pygame.K_DOWN:
                 snake.down()
-            elif event.key == K_LEFT:
+            elif event.key == pygame.K_LEFT:
                 snake.left()
-            elif event.key == K_RIGHT:
+            elif event.key == pygame.K_RIGHT:
                 snake.right()
 
-    # Draw the snake and food
+        elif event.type == PLAYER_EATS_FOOD:
+            scoreboard.handle_event(event)  # Handle the event in the scoreboard
+            print("Player eats food")
+
+    # Spawn a new enemy snake with a 10% chance
+    if random.randint(1, 100) <= 10:
+        color = (255, 0, 0)  # Red color
+        speed = random.randint(1, 3)
+        behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
+
+        enemy_snake = EnemySnake(color, speed, snake, behavior)
+        enemy_snakes.append(enemy_snake)
+
+    # Draw the game elements
     snake.draw(screen)
     food.draw(screen)
-    
+    for enemy_snake in enemy_snakes:
+        enemy_snake.draw(screen)
+
+    # Move the enemy snakes
+    for enemy_snake in enemy_snakes:
+        enemy_snake.move(food, enemy_snakes)
+
     # Update the snake and food
     snake.update(SCREEN_WIDTH, SCREEN_HEIGHT, food)
-    food.update(snake)
+    if food.update(snake):
+        scoreboard.score.increase()
+        pellet_eat_sound.play()
 
-    # Check for collisions with the screen boundaries
-    if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \
-        snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
-         running = False
-         game_over_sound.play()
-
-    # Check for collisions with the snake's tail
-    flat_segments = list(snake.segments.sprites())[1:] # Exclude the head    
-    if pygame.sprite.spritecollide(snake.head, pygame.sprite.Group(*flat_segments), False):
-        running = False
-        game_over_sound.play()
+    scoreboard.draw_scoreboard(screen)  # Draw the scoreboard
 
     # Update the display
     pygame.display.flip()
 
-    # Control the frame rate
+    # Check for collisions
+    if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \
+            snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
+        running = False
+        game_over_sound.play()
+
+    # Check for collisions with the enemy snakes
+    flat_segments = list(snake.segments.sprites())[1:]
+    if pygame.sprite.spritecollide(snake.head, pygame.sprite.Group(*flat_segments), False):
+        running = False
+        game_over_sound.play()
+
     clock.tick(10)
 
-# Quit Pygame
+# Game over
 pygame.quit()
 sys.exit()

@@ -30,6 +30,7 @@ class Snake:
         if self.head.rect.colliderect(food.rect):
             self.extend()
             food.create_new_food()
+            return True
         return self.check_collision(screen_width, screen_height)
 
     def create_snake(self, color=(255, 255, 255)):

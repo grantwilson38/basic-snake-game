@@ -1,6 +1,8 @@
 import pygame
 import random
 
+from events import PLAYER_EATS_FOOD
+
 STARTING_POSITIONS = [(50, 50)]
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]  # red, green, blue
 SCREEN_WIDTH = 600
@@ -20,13 +22,14 @@ class Food(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
     def update(self, snake):
-        for segment in snake.segments:
-            if self.rect.colliderect(segment.rect):
-                self.rect.topleft = random.choice(STARTING_POSITIONS)
-                self.color = random.choice(COLORS)
-                self.image.fill(self.color)
-                snake.extend()
-                return True
+        if self.rect.colliderect(snake.head.rect):
+            print("Food eaten")
+            self.rect.topleft = random.choice(STARTING_POSITIONS)
+            self.color = random.choice(COLORS)
+            self.image.fill(self.color)
+            snake.extend()
+            pygame.event.post(pygame.event.Event(PLAYER_EATS_FOOD))
+            return True
         return False
 
     def create_new_food(self, position=None):
