@@ -85,6 +85,15 @@ while running:
         score.increase()
         pellet_eat_sound.play()
 
+    # Check for collision with enemy snakes
+    for enemy_snake in enemy_snakes:
+        if pygame.sprite.spritecollide(snake.head, enemy_snake.segments, False):
+            game_over_sound.play()
+            pygame.time.delay(4000)
+            running = False
+            pygame.quit()
+            sys.exit()
+
     # Spawn a new enemy snake with a 10% chance
     if random.randint(1, 100) <= 3:
         color = (255, 0, 0)  # Red color
@@ -107,15 +116,14 @@ while running:
     # Update the display
     pygame.display.flip()
 
+    if snake.check_collision(SCREEN_WIDTH, SCREEN_HEIGHT):
+        game_over_sound.play()
+        pygame.time.delay(4000)  # Wait for 2 seconds
+        running = False
+
     # Check for collisions
     if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \
             snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
-        running = False
-        game_over_sound.play()
-
-    # Check for collisions with the enemy snakes
-    flat_segments = list(snake.segments.sprites())[1:]
-    if pygame.sprite.spritecollide(snake.head, pygame.sprite.Group(*flat_segments), False):
         running = False
         game_over_sound.play()
 

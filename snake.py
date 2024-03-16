@@ -44,6 +44,7 @@ class Snake:
         for segment in self.segments.sprites()[1:]:
             if self.head.rect.colliderect(segment.rect):
                 return True
+        return False
 
     def move_towards_food(self, food):
         x_diff = food.rect.x - self.head.rect.x
