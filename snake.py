@@ -6,6 +6,7 @@ import random
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
 SNAKE_SIZE = 10
+SAFE_DISTANCE = 200
 
 STARTING_POSITIONS = [(x, 0) for x in range(0, -SNAKE_SIZE*3, -SNAKE_SIZE)]
 MOVE_DISTANCE = 20
@@ -40,14 +41,9 @@ class Snake:
         for position in STARTING_POSITIONS:
             self.add_segment(position, color)
 
-    def respawn_player(snake, enemy_snakes, min_distance):
-        while True:
-            x = random.randint(0, SCREEN_WIDTH)
-            y = random.randint(0, SCREEN_HEIGHT)
-            snake.rect.center = (x, y)
-
-            if all(pygame.math.Vector2(enemy_snake.rect.center).distance_to(pygame.math.Vector2(x, y)) >= min_distance for enemy_snake in enemy_snakes):
-                break 
+    def respawn_player(self):
+            self.head.rect.center = (50, 50)
+            self.direction = (0, -1)
 
     def check_collision(self, screen_width, screen_height):
         if self.head.rect.left < 0 or self.head.rect.right > screen_width or \

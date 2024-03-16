@@ -121,11 +121,10 @@ while running:
         pygame.time.delay(4000)
         running = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
         if running:
-            snake.respawn_player(enemy_snakes, 100)  # Respawn the player's snake away from all enemy snakes
+            snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
 
-    # Check for collisions
     if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \
-            snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
+       snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
         running = False
         game_over_sound.play()
 
