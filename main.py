@@ -4,6 +4,7 @@ import sys
 import time
 
 from snake import Snake
+from game_functions import play_again
 from food import Food
 from score import Score
 from enemy_snake import EnemySnake
@@ -90,9 +91,7 @@ while running:
         if pygame.sprite.spritecollide(snake.head, enemy_snake.segments, False):
             game_over_sound.play()
             pygame.time.delay(4000)
-            running = False
-            pygame.quit()
-            sys.exit()
+            running = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
 
     # Spawn a new enemy snake with a 10% chance
     if random.randint(1, 100) <= 3:
@@ -119,7 +118,7 @@ while running:
     if snake.check_collision(SCREEN_WIDTH, SCREEN_HEIGHT):
         game_over_sound.play()
         pygame.time.delay(4000)  # Wait for 2 seconds
-        running = False
+        running = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
 
     # Check for collisions
     if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \
