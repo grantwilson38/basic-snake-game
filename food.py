@@ -22,13 +22,17 @@ class Food(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
     def update(self, snake):
+        # Check if self is a pygame.Rect object or has a rect attribute that is a pygame.Rect object
+        if not isinstance(self, pygame.Rect) and not (hasattr(self, 'rect') and isinstance(self.rect, pygame.Rect)):
+            raise TypeError('self must be a pygame.Rect object or have a rect attribute that is a pygame.Rect object')
+
+        # Check if snake.head is a pygame.Rect object or has a rect attribute that is a pygame.Rect object
+        if not isinstance(snake.head, pygame.Rect) and not (hasattr(snake.head, 'rect') and isinstance(snake.head.rect, pygame.Rect)):
+            raise TypeError('snake.head must be a pygame.Rect object or have a rect attribute that is a pygame.Rect object')
+
         if self.rect.colliderect(snake.head.rect):
-            print("Food eaten")
-            self.rect.topleft = random.choice(STARTING_POSITIONS)
-            self.color = random.choice(COLORS)
-            self.image.fill(self.color)
-            snake.extend()
-            pygame.event.post(pygame.event.Event(PLAYER_EATS_FOOD))
+            self.rect.topleft = (random.randint(0, SCREEN_WIDTH - FOOD_SIZE), 
+                                random.randint(0, SCREEN_HEIGHT - FOOD_SIZE))
             return True
         return False
 

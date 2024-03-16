@@ -5,7 +5,7 @@ import time
 
 from snake import Snake
 from food import Food
-from scoreboard import Scoreboard
+from score import Score
 from enemy_snake import EnemySnake
 from events import PLAYER_EATS_FOOD
 
@@ -46,17 +46,23 @@ time.sleep(2)
 # Create the snake, food, and scoreboard
 snake = Snake()
 food = Food(RED, FOOD_SIZE, FOOD_SIZE)
-scoreboard = Scoreboard(snake)
 
 # Create a clock object
 clock = pygame.time.Clock()
 
+# Create the scoreboard
+score = Score()
+
+# Create the enemy snakes list
+enemy_snakes = []  
+
 # Game loop
 running = True
 while running:
-    screen.fill(BLACK)
 
-    enemy_snakes = []  # Define the enemy_snakes list
+    screen.fill(BLACK)  # Fill the screen with black
+    score.draw(screen)  # Draw the score
+
 
     # Handle the events
     for event in pygame.event.get():
@@ -74,12 +80,13 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 snake.right()
 
-        elif event.type == PLAYER_EATS_FOOD:
-            scoreboard.handle_event(event)  # Handle the event in the scoreboard
-            print("Player eats food")
+    snake.update(SCREEN_WIDTH, SCREEN_HEIGHT, food)  # Update the snake
+    if food.update(snake):  # Update the food
+        score.increase()
+        pellet_eat_sound.play()
 
     # Spawn a new enemy snake with a 10% chance
-    if random.randint(1, 100) <= 10:
+    if random.randint(1, 100) <= 3:
         color = (255, 0, 0)  # Red color
         speed = random.randint(1, 3)
         behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
@@ -96,14 +103,6 @@ while running:
     # Move the enemy snakes
     for enemy_snake in enemy_snakes:
         enemy_snake.move(food, enemy_snakes)
-
-    # Update the snake and food
-    snake.update(SCREEN_WIDTH, SCREEN_HEIGHT, food)
-    if food.update(snake):
-        scoreboard.score.increase()
-        pellet_eat_sound.play()
-
-    scoreboard.draw_scoreboard(screen)  # Draw the scoreboard
 
     # Update the display
     pygame.display.flip()
