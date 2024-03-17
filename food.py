@@ -1,8 +1,6 @@
 import pygame
 import random
 
-from events import PLAYER_EATS_FOOD
-
 STARTING_POSITIONS = [(50, 50)]
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]  # red, green, blue
 SCREEN_WIDTH = 600

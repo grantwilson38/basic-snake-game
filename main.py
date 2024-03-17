@@ -8,12 +8,11 @@ from game_functions import play_again
 from food import Food
 from score import Score
 from enemy_snake import EnemySnake
-from events import PLAYER_EATS_FOOD
 
 pygame.init()
 
-# Define custom events
-PLAYER_EATS_FOOD = pygame.USEREVENT + 1
+# Create a font object
+font = pygame.font.Font(None, 36)
 
 # Define the game constants
 SCREEN_WIDTH = 600
@@ -48,6 +47,9 @@ time.sleep(2)
 snake = Snake()
 food = Food(RED, FOOD_SIZE, FOOD_SIZE)
 
+# Initialize player's lives
+player_lives = 3
+
 # Create a clock object
 clock = pygame.time.Clock()
 
@@ -63,7 +65,10 @@ while running:
 
     screen.fill(BLACK)  # Fill the screen with black
     score.draw(screen)  # Draw the score
+    lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
 
+    # Blit the lives surface to the screen
+    screen.blit(lives_surface, (10, 10))
 
     # Handle the events
     for event in pygame.event.get():
@@ -91,16 +96,22 @@ while running:
         if pygame.sprite.spritecollide(snake.head, enemy_snake.segments, False):
             game_over_sound.play()
             pygame.time.delay(4000)
-            running = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    # Spawn a new enemy snake with a 10% chance
-    if random.randint(1, 100) <= 3:
-        color = (255, 0, 0)  # Red color
-        speed = random.randint(1, 3)
-        behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
+            keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
+        
+            if keep_playing:
+                snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
+            else:
+                running = False
 
-        enemy_snake = EnemySnake(color, speed, snake, behavior)
-        enemy_snakes.append(enemy_snake)
+        # Spawn a new enemy snake with a 10% chance
+        if random.randint(1, 100) <= 3:
+            color = (255, 0, 0)  # Red color
+            speed = random.randint(1, 3)
+            behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
+
+            enemy_snake = EnemySnake(color, speed, snake, behavior)
+            enemy_snakes.append(enemy_snake)
 
     # Draw the game elements
     snake.draw(screen)
@@ -128,7 +139,7 @@ while running:
         running = False
         game_over_sound.play()
 
-    clock.tick(10)
+    clock.tick(15)
 
 # Game over
 pygame.quit()
