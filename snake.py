@@ -43,7 +43,7 @@ class Snake:
 
     def respawn_player(self):
             self.head.rect.center = (50, 50)
-            self.direction = (0, -1)
+            self.direction = (1, 0)
 
     def check_collision(self, screen_width, screen_height):
         if self.head.rect.left < 0 or self.head.rect.right > screen_width or \
