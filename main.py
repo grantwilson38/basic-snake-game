@@ -68,7 +68,7 @@ while running:
     lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
 
     # Blit the lives surface to the screen
-    screen.blit(lives_surface, (10, 10))
+    screen.blit(lives_surface, (500, 10))
 
     # Handle the events
     for event in pygame.event.get():
@@ -104,14 +104,14 @@ while running:
             else:
                 running = False
 
-        # Spawn a new enemy snake with a 10% chance
-        if random.randint(1, 100) <= 3:
-            color = (255, 0, 0)  # Red color
-            speed = random.randint(1, 3)
-            behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
+    # Spawn a new enemy snake with a 10% chance
+    if random.randint(1, 100) <= 15:
+        color = (255, 0, 0)  # Red color
+        speed = random.randint(1, 3)
+        behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
 
-            enemy_snake = EnemySnake(color, speed, snake, behavior)
-            enemy_snakes.append(enemy_snake)
+        enemy_snake = EnemySnake(color, speed, snake, behavior, SCREEN_WIDTH, SCREEN_HEIGHT)
+        enemy_snakes.append(enemy_snake)
 
     # Draw the game elements
     snake.draw(screen)
@@ -130,7 +130,7 @@ while running:
        any(pygame.sprite.spritecollide(snake.head, enemy_snake.segments, False) for enemy_snake in enemy_snakes):
         game_over_sound.play()
         pygame.time.delay(4000)
-        running = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
+        keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
         if running:
             snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
 
@@ -139,7 +139,7 @@ while running:
         running = False
         game_over_sound.play()
 
-    clock.tick(15)
+    clock.tick(13)
 
 # Game over
 pygame.quit()

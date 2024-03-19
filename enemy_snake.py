@@ -3,6 +3,10 @@ import pygame
 import random
 import math
 
+# Define game constants
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
+
 # Define the directions
 RIGHT = (1, 0)
 LEFT = (-1, 0)
@@ -16,7 +20,7 @@ pygame.mixer.init()
 enemy_spawn = pygame.mixer.Sound("enemy_spawn.mp3")
 
 class EnemySnake(Snake):
-    def __init__(self, color, speed, player_snake, behavior):
+    def __init__(self, color, speed, player_snake, behavior, SCREEN_WIDTH, SCREEN_HEIGHT):
         super().__init__(color)
         self.speed = speed
         self.behavior = behavior
@@ -41,7 +45,8 @@ class EnemySnake(Snake):
             self.move_randomly()
         elif self.behavior == "chase_enemy":
             # Calculate the distance between the enemy snake's head and the head of each other snake
-            closest_enemy = min(enemy_snakes, key=lambda snake: math.hypot(self.head.rect.x - snake.head.rect.x, self.head.rect.y - snake.head.rect.y))
+            other_enemies = [snake for snake in enemy_snakes if snake != self]
+            closest_enemy = min(other_enemies, key=lambda snake: math.hypot(self.head.rect.x - snake.head.rect.x, self.head.rect.y - snake.head.rect.y))
             self.move_towards(closest_enemy.head.rect)
 
         super().move()
