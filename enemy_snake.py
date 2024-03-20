@@ -46,8 +46,9 @@ class EnemySnake(Snake):
         elif self.behavior == "chase_enemy":
             # Calculate the distance between the enemy snake's head and the head of each other snake
             other_enemies = [snake for snake in enemy_snakes if snake != self]
-            closest_enemy = min(other_enemies, key=lambda snake: math.hypot(self.head.rect.x - snake.head.rect.x, self.head.rect.y - snake.head.rect.y))
-            self.move_towards(closest_enemy.head.rect)
+            if other_enemies:  # Check if other_enemies is not empty
+                closest_enemy = min(other_enemies, key=lambda snake: math.hypot(self.head.rect.x - snake.head.rect.x, self.head.rect.y - snake.head.rect.y))
+                self.move_towards(closest_enemy.head.rect)
 
         super().move()
 

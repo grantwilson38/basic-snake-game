@@ -42,8 +42,13 @@ class Snake:
             self.add_segment(position, color)
 
     def respawn_player(self):
-            self.head.rect.center = (50, 50)
-            self.direction = (1, 0)
+        self.head.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)  # Center of the screen
+        self.direction = RIGHT
+
+        # Reposition the body segments
+        for i, segment in enumerate(self.segments.sprites()):
+            segment.rect.center = (50 - (i+1)*20, 50)
+
 
     def check_collision(self, screen_width, screen_height):
         if self.head.rect.left < 0 or self.head.rect.right > screen_width or \
