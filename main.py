@@ -106,9 +106,9 @@ while running:
                 running = False
 
     # Spawn a new enemy snake with a 10% chance
-    if random.randint(1, 100) <= 10:
+    if random.randint(1, 100) <= 5:
         color = (255, 0, 0)  # Red color
-        speed = random.randint(3, 5)
+        speed = random.randint(1, 6)
         behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
 
         enemy_snake = EnemySnake(color, speed, snake, behavior, SCREEN_WIDTH, SCREEN_HEIGHT)
