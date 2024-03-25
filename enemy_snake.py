@@ -1,7 +1,10 @@
-from snake import Snake
+from snake import Snake, SnakeSegment
 import pygame
 import random
 import math
+import pygame.mixer
+initialize = pygame.init()
+enemy_eat = pygame.mixer.Sound("enemy_eat.mp3")
 
 # Define game constants
 SCREEN_WIDTH = 600
@@ -41,6 +44,13 @@ class EnemySnake(Snake):
             self.move_towards(self.player_snake.head)
         elif self.behavior == "chase_food":
             self.move_towards(food.rect)
+            # Check for a collision with the food
+            if pygame.sprite.collide_rect(self.head, food):
+                enemy_eat.play()
+                food.create_new_food()  # Spawn a new food
+                # Add two new segments at the position of the last segment
+                for _ in range(2):
+                        self.add_segment(self.segments.sprites()[-1].rect.topleft, self.color)
         elif self.behavior == "random":
             self.move_randomly()
         elif self.behavior == "chase_enemy":

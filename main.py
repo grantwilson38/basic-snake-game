@@ -105,10 +105,10 @@ while running:
             else:
                 running = False
 
-    # Spawn a new enemy snake with a 10% chance
-    if random.randint(1, 100) <= 5:
+    # Spawn a new enemy snake with a 2% chance
+    if random.randint(1, 100) <= 2:
         color = (255, 0, 0)  # Red color
-        speed = random.randint(1, 6)
+        speed = random.randint(4, 6)
         behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
 
         enemy_snake = EnemySnake(color, speed, snake, behavior, SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -141,7 +141,7 @@ while running:
         running = False
         game_over_sound.play()
 
-    clock.tick(12)
+    clock.tick(10)
 
 # Game over
 pygame.quit()
