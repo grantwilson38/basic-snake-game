@@ -123,6 +123,8 @@ while running:
     # Move the enemy snakes
     for enemy_snake in enemy_snakes:
         enemy_snake.move(food, enemy_snakes)
+        if not enemy_snake.alive:
+            enemy_snakes.remove(enemy_snake)
 
     # Update the display
     pygame.display.flip()

@@ -5,6 +5,7 @@ import math
 import pygame.mixer
 initialize = pygame.init()
 enemy_eat = pygame.mixer.Sound("enemy_eat.mp3")
+enemy_death = pygame.mixer.Sound("enemy_death.mp3")
 
 # Define game constants
 SCREEN_WIDTH = 600
@@ -28,6 +29,7 @@ class EnemySnake(Snake):
         self.speed = speed
         self.behavior = behavior
         self.player_snake = player_snake
+        self.alive = True
 
         # Set the head's position to a random point within the screen boundaries
         self.head.rect.topleft = (random.randint(0, 560), random.randint(0, 560))
@@ -59,6 +61,14 @@ class EnemySnake(Snake):
             if other_enemies:  # Check if other_enemies is not empty
                 closest_enemy = min(other_enemies, key=lambda snake: math.hypot(self.head.rect.x - snake.head.rect.x, self.head.rect.y - snake.head.rect.y))
                 self.move_towards(closest_enemy.head.rect)
+
+        # Check for a collision with other enemy snakes
+        other_enemies = [snake for snake in enemy_snakes if snake != self]
+        for enemy in other_enemies:
+            if pygame.sprite.spritecollide(self.head, enemy.segments, False):
+                self.alive = False  # Set the snake to dead
+                enemy_death.play()
+                break
 
         super().move()
 
