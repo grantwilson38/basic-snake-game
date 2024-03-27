@@ -50,7 +50,7 @@ class EnemySnake(Snake):
                 food.create_new_food()  # Spawn a new food
                 # Add two new segments at the position of the last segment
                 for _ in range(2):
-                        self.add_segment(self.segments.sprites()[-1].rect.topleft, self.color)
+                    self.add_segment(self.head.rect.topleft, self.color)
         elif self.behavior == "random":
             self.move_randomly()
         elif self.behavior == "chase_enemy":
@@ -62,6 +62,18 @@ class EnemySnake(Snake):
 
         super().move()
 
+    def add_segment(self, position, color):
+        # Create a new segment
+        new_segment = SnakeSegment(position, color)
+
+        # If the snake has segments, add the new segment at the end of the snake
+        if self.segments:
+            last_segment = self.segments.sprites()[-1]
+            new_segment.rect.topleft = (last_segment.rect.x - new_segment.rect.width, last_segment.rect.y)
+
+        # Add the new segment to the segments group
+        self.segments.add(new_segment)
+
     def move_towards(self, target):
         if isinstance(target, pygame.Rect):
             target_x = target.x
@@ -72,6 +84,12 @@ class EnemySnake(Snake):
 
         x_diff = target_x - self.head.rect.x
         y_diff = target_y - self.head.rect.y
+        distance = math.hypot(x_diff, y_diff)
+
+        if distance > 0:
+            x_diff, y_diff = x_diff / distance, y_diff / distance  # Normalize the direction vector (dx, dy)
+            self.head.rect.x += x_diff * self.speed
+            self.head.rect.y += y_diff * self.speed
 
         if abs(x_diff) > abs(y_diff):
             # Move horizontally
