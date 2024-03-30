@@ -9,6 +9,8 @@ from food import Food
 from score import Score
 from enemy_snake import EnemySnake
 
+from game_over_screen import GameOverScreen
+
 pygame.init()
 
 # Create a font object
@@ -36,6 +38,9 @@ except pygame.error as e:
 # Create the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Snake Game")
+
+# Create the game over screen
+game_over_screen = GameOverScreen(screen, font)
 
 # Play the game start sound
 game_start_sound.play()
@@ -143,8 +148,13 @@ while running:
         running = False
         game_over_sound.play()
 
+    # Check if the player has run out of lives
+    if player_lives == 0:
+        running = False
+
     clock.tick(10)
 
 # Game over
+game_over_screen.display()
 pygame.quit()
 sys.exit()
