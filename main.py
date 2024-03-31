@@ -102,13 +102,19 @@ while running:
             game_over_sound.play()
             pygame.time.delay(4000)
 
-            keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
-        
-            if keep_playing:
+            player_lives -= 1  # Decrease player's lives by 1
+
+            if player_lives > 0:
                 snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
                 enemy_snakes = []  # Remove all enemy snakes from the screen
             else:
-                running = False
+                keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
+                if keep_playing:
+                    player_lives = 3  # Reset player's lives
+                    snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
+                    enemy_snakes = []  # Remove all enemy snakes from the screen
+                else:
+                    running = False
 
     # Spawn a new enemy snake with a 2% chance
     if random.randint(1, 100) <= 2:
@@ -143,10 +149,22 @@ while running:
             snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
             enemy_snakes = []  # Remove all enemy snakes from the screen
 
+    # Check if the player has run into the walls
     if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \
        snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
-        running = False
         game_over_sound.play()
+        player_lives -= 1  # Decrease player's lives by 1
+        if player_lives > 0:
+            snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
+            enemy_snakes = []  # Remove all enemy snakes from the screen
+        else:
+            keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
+            if keep_playing:
+                player_lives = 3  # Reset player's lives
+                snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
+                enemy_snakes = []  # Remove all enemy snakes from the screen
+            else:
+                running = False
 
     # Check if the player has run out of lives
     if player_lives == 0:
