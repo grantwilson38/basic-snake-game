@@ -64,6 +64,18 @@ score = Score()
 # Create the enemy snakes list
 enemy_snakes = []  
 
+def check_game_over(player_lives):
+    if player_lives <= 0:
+        keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
+        if keep_playing:
+            snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
+            enemy_snakes = []  # Remove all enemy snakes from the screen
+            player_lives = 3  # Reset the player's lives
+            return True, player_lives
+        else:
+            return False, player_lives
+    return True, player_lives
+
 # Game loop
 running = True
 while running:
@@ -107,19 +119,11 @@ while running:
             if player_lives > 0:
                 snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
                 enemy_snakes = []  # Remove all enemy snakes from the screen
-            else:
-                keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
-                if keep_playing:
-                    player_lives = 3  # Reset player's lives
-                    snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
-                    enemy_snakes = []  # Remove all enemy snakes from the screen
-                else:
-                    running = False
 
     # Spawn a new enemy snake with a 2% chance
     if random.randint(1, 100) <= 2:
         color = (255, 0, 0)  # Red color
-        speed = random.randint(2, 5)
+        speed = random.randint(3, 5)
         behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
 
         enemy_snake = EnemySnake(color, speed, snake, behavior, SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -154,21 +158,21 @@ while running:
        snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
         game_over_sound.play()
         player_lives -= 1  # Decrease player's lives by 1
-        if player_lives > 0:
-            snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
-            enemy_snakes = []  # Remove all enemy snakes from the screen
-        else:
-            keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
-            if keep_playing:
-                player_lives = 3  # Reset player's lives
+        # Render the player's lives on the screen after they have been updated
+        lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
+        screen.blit(lives_surface, (500, 10))
+        if player_lives <= 0:
+            running, player_lives = check_game_over(player_lives)
+            if running:
                 snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
                 enemy_snakes = []  # Remove all enemy snakes from the screen
-            else:
-                running = False
+        else:
+            snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
+            enemy_snakes = []  # Remove all enemy snakes from the screen
 
-    # Check if the player has run out of lives
-    if player_lives == 0:
-        running = False
+    # Check if the game is over
+    if not running:
+        running, player_lives = check_game_over(player_lives)
 
     clock.tick(10)
 

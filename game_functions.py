@@ -12,7 +12,6 @@ def play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives):
                 return False, player_lives
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if button.collidepoint(event.pos):
-                    player_lives -= 1
                     return True, player_lives
 
         pygame.draw.rect(screen, (0, 255, 0), button)  # Draw the button
