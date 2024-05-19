@@ -49,11 +49,13 @@ class Snake:
         for i, segment in enumerate(self.segments.sprites()):
             segment.rect.center = (50 - (i+1)*20, 50)
 
+    # Check if the snake collides with the screen boundaries or itself
     def check_collision(self, screen_width, screen_height):
         if self.head.rect.left < 0 or self.head.rect.right > screen_width or \
         self.head.rect.top < 0 or self.head.rect.bottom > screen_height:
             return True
 
+        # Check if snake has hit itself
         for segment in self.segments.sprites()[1:]:
             if self.head.rect.colliderect(segment.rect):
                 return True

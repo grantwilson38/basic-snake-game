@@ -40,7 +40,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Snake Game")
 
 # Create the game over screen
-game_over_screen = GameOverScreen(screen, font)
+game_over_screen = GameOverScreen(screen, font, 600, 600, "You Lost", (255, 0, 0), 5000)
 
 # Play the game start sound
 game_start_sound.play()
@@ -66,15 +66,9 @@ enemy_snakes = []
 
 def check_game_over(player_lives):
     if player_lives <= 0:
-        keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
-        if keep_playing:
-            snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
-            enemy_snakes = []  # Remove all enemy snakes from the screen
-            player_lives = 3  # Reset the player's lives
-            return True, player_lives
-        else:
-            return False, player_lives
-    return True, player_lives
+        return False, player_lives
+    else:
+        return True, player_lives
 
 # Game loop
 running = True
@@ -86,6 +80,9 @@ while running:
 
     # Blit the lives surface to the screen
     screen.blit(lives_surface, (500, 10))
+
+    # Check if the game is over
+    running, player_lives = check_game_over(player_lives)
 
     # Handle the events
     for event in pygame.event.get():
@@ -147,6 +144,7 @@ while running:
     if snake.check_collision(SCREEN_WIDTH, SCREEN_HEIGHT) or \
        any(pygame.sprite.spritecollide(snake.head, enemy_snake.segments, False) for enemy_snake in enemy_snakes):
         game_over_sound.play()
+        player_lives -= 1  # Decrease player's lives by 1
         pygame.time.delay(4000)
         keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
         if running:
@@ -158,22 +156,42 @@ while running:
        snake.head.rect.top < 0 or snake.head.rect.bottom > SCREEN_HEIGHT:
         game_over_sound.play()
         player_lives -= 1  # Decrease player's lives by 1
-        # Render the player's lives on the screen after they have been updated
-        lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
-        screen.blit(lives_surface, (500, 10))
+
+        snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
+        enemy_snakes = []  # Remove all enemy snakes from the screen
+        
         if player_lives <= 0:
-            running, player_lives = check_game_over(player_lives)
-            if running:
-                snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
-                enemy_snakes = []  # Remove all enemy snakes from the screen
-        else:
-            snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
-            enemy_snakes = []  # Remove all enemy snakes from the screen
+            running = False
+        
+    # Render the player's lives on the screen after they have been updated
+    lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
+    screen.blit(lives_surface, (500, 10))
 
     # Check if the game is over
     if not running:
-        running, player_lives = check_game_over(player_lives)
+        # Game over loop
+        while True:
+            play_again = game_over_screen.ask_play_again()
+            if play_again:
+                # Reset the game state and start a new game
+                running = True
+                snake.respawn_player()
+                enemies = []  # Clear the list of enemies
+                bullets = []  # Clear the list of bullets
+                score = 0  # Reset the score
+                lives = 3  # Reset the number of lives
+                break
+            elif play_again is False:
+                pygame.quit()
+                sys.exit()
+        
+        # Process events in the game over loop
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
+    pygame.display.update()
     clock.tick(10)
 
 # Game over
