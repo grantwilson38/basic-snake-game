@@ -15,20 +15,14 @@ class GameOverScreen:
         game_over_text = self.font.render(self.text, True, self.color)
         self.screen.blit(game_over_text, (self.width // 2 - game_over_text.get_width() // 2, self.height // 2 - game_over_text.get_height() // 2))
         pygame.display.flip()
-
-        start_ticks = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - start_ticks < self.wait_time:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
         
     def ask_play_again(self):
         print("ask_play_again called") # Debugging
         self.text = "Game Over. Play Again? (Y/N)"
         self.display()  # Display the game over screen
 
-        while True:  # Wait for a key press
+        start_ticks = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - start_ticks < self.wait_time:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

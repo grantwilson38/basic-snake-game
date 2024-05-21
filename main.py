@@ -117,8 +117,8 @@ while running:
                 snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
                 enemy_snakes = []  # Remove all enemy snakes from the screen
 
-    # Spawn a new enemy snake with a 2% chance
-    if random.randint(1, 100) <= 2:
+    # Spawn a new enemy snake with a 3% chance
+    if random.randint(1, 100) <= 3:
         color = (255, 0, 0)  # Red color
         speed = random.randint(3, 5)
         behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
@@ -141,11 +141,13 @@ while running:
     # Update the display
     pygame.display.flip()
 
+    # Check if the player has run into the walls or collided with an enemy snake
     if snake.check_collision(SCREEN_WIDTH, SCREEN_HEIGHT) or \
        any(pygame.sprite.spritecollide(snake.head, enemy_snake.segments, False) for enemy_snake in enemy_snakes):
         game_over_sound.play()
         player_lives -= 1  # Decrease player's lives by 1
         pygame.time.delay(4000)
+        # Check if the player has any lives left
         keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
         if running:
             snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
@@ -178,7 +180,7 @@ while running:
                 snake.respawn_player()
                 enemies = []  # Clear the list of enemies
                 bullets = []  # Clear the list of bullets
-                score = 0  # Reset the score
+                score.reset()  # Reset the score
                 lives = 3  # Reset the number of lives
                 break
             elif play_again is False:
