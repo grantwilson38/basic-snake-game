@@ -172,18 +172,17 @@ while running:
     # Check if the game is over
     if not running:
         # Game over loop
-        while True:
-            play_again = game_over_screen.ask_play_again()
-            if play_again:
+        while not running:
+            play_again_response = game_over_screen.ask_play_again()
+            if play_again_response:
                 # Reset the game state and start a new game
                 running = True
                 snake.respawn_player()
                 enemies = []  # Clear the list of enemies
                 bullets = []  # Clear the list of bullets
                 score.reset()  # Reset the score
-                lives = 3  # Reset the number of lives
-                break
-            elif play_again is False:
+                player_lives = 3  # Reset the number of lives
+            elif play_again_response is False:
                 pygame.quit()
                 sys.exit()
         

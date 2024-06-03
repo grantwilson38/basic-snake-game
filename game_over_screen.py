@@ -21,8 +21,7 @@ class GameOverScreen:
         self.text = "Game Over. Play Again? (Y/N)"
         self.display()  # Display the game over screen
 
-        start_ticks = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - start_ticks < self.wait_time:
+        while True: 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
