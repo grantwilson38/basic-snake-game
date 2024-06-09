@@ -27,7 +27,6 @@ class GameOverScreen:
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
-                    print("Key pressed:", event.key)  # Debug print
                     if event.key == pygame.K_y:  # If the "Y" key is pressed
                         return True
                     elif event.key == pygame.K_n:  # If the "N" key is pressed

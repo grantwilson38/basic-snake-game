@@ -3,11 +3,13 @@ import random
 import sys
 import time
 
+from game_level import Level
 from snake import Snake
 from game_functions import play_again
 from food import Food
 from score import Score
 from enemy_snake import EnemySnake
+from miniboss import MiniBoss
 
 from game_over_screen import GameOverScreen
 
@@ -55,6 +57,12 @@ food = Food(RED, FOOD_SIZE, FOOD_SIZE)
 # Initialize player's lives
 player_lives = 3
 
+# Create a Level object
+level = Level()
+
+# Initialize the pellet counter
+pellet_counter = 0
+
 # Create a clock object
 clock = pygame.time.Clock()
 
@@ -76,6 +84,7 @@ while running:
 
     screen.fill(BLACK)  # Fill the screen with black
     score.draw(screen)  # Draw the score
+    level.draw(screen, font)  # Draw the level
     lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
 
     # Blit the lives surface to the screen
@@ -103,6 +112,9 @@ while running:
     snake.update(SCREEN_WIDTH, SCREEN_HEIGHT, food)  # Update the snake
     if food.update(snake):  # Update the food
         score.increase()
+        pellet_counter += 1
+        if pellet_counter % 1 == 0:
+            level.increase()
         pellet_eat_sound.play()
 
     # Check for collision with enemy snakes
@@ -164,6 +176,16 @@ while running:
         
         if player_lives <= 0:
             running = False
+
+    # Check if the level is three and the miniboss has not been created yet
+    if level.level == 3 and level.miniboss is None:
+        level.miniboss = MiniBoss(SCREEN_HEIGHT)
+
+    # If the miniboss exists, update and draw it
+    if level.miniboss is not None:
+        level.miniboss.update()
+        level.miniboss.draw(screen)
+        
         
     # Render the player's lives on the screen after they have been updated
     lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
