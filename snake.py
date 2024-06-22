@@ -21,7 +21,6 @@ class SnakeSegment(pygame.sprite.Sprite):
         self.image = pygame.Surface((20, 20))
         self.image.fill(color)
         self.rect = self.image.get_rect(topleft=position)
-        self.invincible = False
 
 class Snake:
     def __init__(self, color=(255, 255, 255)):
@@ -30,9 +29,15 @@ class Snake:
         self.head = self.segments.sprites()[0]
         self.color = color
         self.direction = RIGHT
+        self.invincible = False
+        self.invincibility_timer = 0
 
     def update(self, screen_width, screen_height, food):
         self.move()
+
+        if self.invincible and (pygame.time.get_ticks() - self.invincibility_timer > 5000):  # Assuming 5 seconds of invincibility
+            self.make_vulnerable()
+        
         if self.head.rect.colliderect(food.rect):
             self.extend()
             return True
@@ -52,7 +57,15 @@ class Snake:
 
     def make_invincible(self):
         self.invincible = True
-        self.color = (0, 255, 0)  # Change the color to green
+        self.invincibility_timer = pygame.time.get_ticks()  # Start the timer
+
+        for segment in self.segments.sprites():
+            segment.image.fill((255, 255, 0))  # Change color to yellow
+
+    def make_vulnerable(self):
+        self.invincible = False
+        for segment in self.segments.sprites():
+            segment.image.fill((255, 255, 255))  # Change color back to white
 
     # Check if the snake collides with the screen boundaries or itself
     def check_collision(self, screen_width, screen_height):
@@ -78,6 +91,8 @@ class Snake:
         self.move()
 
     def add_segment(self, position, color=(255, 255, 255)):
+        if color is None:
+            color = self.color 
         new_segment = SnakeSegment(position, color)
         self.segments.add(new_segment)
 

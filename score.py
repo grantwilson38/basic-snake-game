@@ -14,3 +14,6 @@ class Score:
 
     def reset(self):
         self.score = 0
+
+    def double(self):
+        self.score *= 2
