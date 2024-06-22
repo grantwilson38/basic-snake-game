@@ -12,7 +12,7 @@ class MiniBoss:
         self.rect = pygame.Rect(self.position[0], self.position[1], self.size[0], self.size[1])
 
         # Load the image
-        sprite_sheet = pygame.image.load(r"C:\Users\grant\OneDrive\Documents\GitHub\snakeGame\scorpion-move.png")
+        sprite_sheet = pygame.image.load("Images\scorpion-move.png")
 
         # Define the size and position of the sprites you want to extract
         sprite_rect1 = pygame.Rect(0, 0, 64, 64)  # For the first scorpion

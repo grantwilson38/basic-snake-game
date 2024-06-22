@@ -4,8 +4,8 @@ import random
 import math
 import pygame.mixer
 initialize = pygame.init()
-enemy_eat = pygame.mixer.Sound("enemy_eat.mp3")
-enemy_death = pygame.mixer.Sound("enemy_death.mp3")
+enemy_eat = pygame.mixer.Sound("Sounds/enemy_eat.mp3")
+enemy_death = pygame.mixer.Sound("Sounds/enemy_death.mp3")
 
 # Define game constants
 SCREEN_WIDTH = 600
@@ -21,15 +21,16 @@ UP = (0, -1)
 pygame.mixer.init()
 
 # Load the sound file
-enemy_spawn = pygame.mixer.Sound("enemy_spawn.mp3")
+enemy_spawn = pygame.mixer.Sound("Sounds/enemy_spawn.mp3")
 
 class EnemySnake(Snake):
-    def __init__(self, color, speed, player_snake, behavior, SCREEN_WIDTH, SCREEN_HEIGHT):
+    def __init__(self, color, speed, player_snake, behavior, size):
         super().__init__(color)
         self.speed = speed
         self.behavior = behavior
         self.player_snake = player_snake
         self.alive = True
+        self.size = size
 
         # Set the head's position to a random point within the screen boundaries
         self.head.rect.topleft = (random.randint(0, 560), random.randint(0, 560))
@@ -44,6 +45,7 @@ class EnemySnake(Snake):
         # Move the head of the snake based on the behavior
         if self.behavior == "chase_player":
             self.move_towards(self.player_snake.head)
+
         elif self.behavior == "chase_food":
             self.move_towards(food.rect)
             # Check for a collision with the food
@@ -53,22 +55,35 @@ class EnemySnake(Snake):
                 # Add two new segments at the position of the last segment
                 for _ in range(2):
                     self.add_segment(self.head.rect.topleft, self.color)
+
         elif self.behavior == "random":
             self.move_randomly()
+
         elif self.behavior == "chase_enemy":
             # Calculate the distance between the enemy snake's head and the head of each other snake
             other_enemies = [snake for snake in enemy_snakes if snake != self]
             if other_enemies:  # Check if other_enemies is not empty
                 closest_enemy = min(other_enemies, key=lambda snake: math.hypot(self.head.rect.x - snake.head.rect.x, self.head.rect.y - snake.head.rect.y))
                 self.move_towards(closest_enemy.head.rect)
+            else:
+                self.move_towards(self.player_snake.head)
 
         # Check for a collision with other enemy snakes
-        other_enemies = [snake for snake in enemy_snakes if snake != self]
-        for enemy in other_enemies:
-            if pygame.sprite.spritecollide(self.head, enemy.segments, False):
-                self.alive = False  # Set the snake to dead
-                enemy_death.play()
-                break
+        for enemy in enemy_snakes:
+            if enemy != self and pygame.sprite.spritecollide(self.head, enemy.segments, False):
+                # Compare sizes to determine the outcome
+                if self.size > enemy.size:
+                    self.size += enemy.size  # Optionally increase the size of the bigger snake
+                    enemy.alive = False  # Mark the smaller snake as dead
+                    enemy_death.play()  # Play death sound for the smaller snake
+                    # Add segments equivalent to the size of the eaten snake
+                    for _ in range(enemy.size):
+                        self.add_segment(self.head.rect.topleft, self.color)
+                elif self.size < enemy.size:
+                    self.alive = False  # This snake is smaller and gets eaten
+                    enemy.size += self.size  # Optionally increase the size of the bigger snake
+                    enemy_death.play()  # Play death sound for this snake
+                break  # Exit the loop after handling collision
 
         super().move()
 

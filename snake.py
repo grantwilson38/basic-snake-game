@@ -21,6 +21,7 @@ class SnakeSegment(pygame.sprite.Sprite):
         self.image = pygame.Surface((20, 20))
         self.image.fill(color)
         self.rect = self.image.get_rect(topleft=position)
+        self.invincible = False
 
 class Snake:
     def __init__(self, color=(255, 255, 255)):
@@ -48,6 +49,10 @@ class Snake:
         # Reposition the body segments
         for i, segment in enumerate(self.segments.sprites()):
             segment.rect.center = (50 - (i+1)*20, 50)
+
+    def make_invincible(self):
+        self.invincible = True
+        self.color = (0, 255, 0)  # Change the color to green
 
     # Check if the snake collides with the screen boundaries or itself
     def check_collision(self, screen_width, screen_height):

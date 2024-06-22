@@ -9,7 +9,9 @@ from game_functions import play_again
 from food import Food
 from score import Score
 from enemy_snake import EnemySnake
+
 from miniboss import MiniBoss
+from powerups import PowerUp
 
 from game_over_screen import GameOverScreen
 
@@ -30,10 +32,12 @@ RED = (255, 0, 0)
 
 # Load sounds
 try:
-    game_over_sound = pygame.mixer.Sound("game_over.wav")
-    game_start_sound = pygame.mixer.Sound("game_start.wav")
-    pellet_eat_sound = pygame.mixer.Sound("pellet_eat.wav")
-    miniboss_collision_sound = pygame.mixer.Sound("miniboss_collision.wav")  # Water Bottle Crush by MysteryPancake -- https://freesound.org/s/434453/ -- License: Attribution 4.0
+    game_over_sound = pygame.mixer.Sound("Sounds/game_over.wav")
+    game_start_sound = pygame.mixer.Sound("Sounds/game_start.wav")
+    pellet_eat_sound = pygame.mixer.Sound("Sounds/pellet_eat.wav")
+    scorpion_spawn_sound = pygame.mixer.Sound("Sounds/scorpion_spawn.mp3")
+    miniboss_collision_sound = pygame.mixer.Sound("Sounds/miniboss_collision.wav")  # Water Bottle Crush by MysteryPancake -- https://freesound.org/s/434453/ -- License: Attribution 4.0
+    power_up_sound = pygame.mixer.Sound("Sounds/power_up.wav")
 except pygame.error as e:
     print("Error loading sound files:", e)
     sys.exit()
@@ -81,7 +85,14 @@ def check_game_over(player_lives):
 
 # Game loop
 running = True
+power_ups = [] # List to store active power-ups
+spawn_power_up_event = pygame.USEREVENT + 1
+pygame.time.set_timer(spawn_power_up_event, 10000)  # Spawn a power-up every 10 seconds
+
 while running:
+
+    # Initialize the miniboss_spawned flag before the game loop
+    miniboss_spawned = False
 
     screen.fill(BLACK)  # Fill the screen with black
     score.draw(screen)  # Draw the score
@@ -110,6 +121,20 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 snake.right()
 
+        elif event.type == spawn_power_up_event:
+            # Spawn a new power-up at a random location
+            x = random.randint(0, SCREEN_WIDTH)
+            y = random.randint(0, SCREEN_HEIGHT)
+            power_up_type = random.choice(["invincibility", "size_increase", "score_multiplier", "new_power_up_1", "new_power_up_2", "new_power_up_3", "new_power_up_4", "new_power_up_5", "new_power_up_6", "new_power_up_7", "new_power_up_8", "new_power_up_9", "new_power_up_10", "new_power_up_11", "new_power_up_12", "new_power_up_13", "new_power_up_14", "new_power_up_15", "new_power_up_16", "new_power_up_17", "new_power_up_18", "new_power_up_19", "new_power_up_20", "new_power_up_21", "new_power_up_22", "new_power_up_23", "new_power_up_24", "new_power_up_25", "new_power_up_26", "new_power_up_27", "new_power_up_28", "new_power_up_29", "new_power_up_30", "new_power_up_31", "new_power_up_32", "new_power_up_33", "new_power_up_34", "new_power_up_35", "new_power_up_36", "new_power_up_37", "new_power_up_38", "new_power_up_39", "new_power_up_40", "new_power_up_41", "new_power_up_42", "new_power_up_43", "new_power_up_44", "new_power_up_45", "new_power_up_46", "new_power_up_47", "new_power_up_48", "new_power_up_49", "new_power_up_50", "new_power_up_51", "new_power_up_52", "new_power_up_53", "new_power_up_54", "new_power_up_55"])
+            new_power_up = PowerUp(power_up_type, (x, y), 5000)  # Assuming duration is in milliseconds
+            power_ups.append(new_power_up)
+    
+    for power_up in power_ups:
+        power_up.draw(screen)
+        if power_up.check_collision_with_player(snake):
+            power_up.apply_effect(snake)
+            power_ups.remove(power_up)  # Remove the power-up after applying its effect
+
     snake.update(SCREEN_WIDTH, SCREEN_HEIGHT, food)  # Update the snake
     if food.update(snake):  # Update the food
         score.increase()
@@ -135,8 +160,9 @@ while running:
         color = (255, 0, 0)  # Red color
         speed = random.randint(3, 5)
         behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
+        size = random.randint(3, 5)
 
-        enemy_snake = EnemySnake(color, speed, snake, behavior, SCREEN_WIDTH, SCREEN_HEIGHT)
+        enemy_snake = EnemySnake(color, speed, snake, behavior, size)
         enemy_snakes.append(enemy_snake)
 
     # Draw the game elements
@@ -155,6 +181,13 @@ while running:
     if level.miniboss is not None:
         level.miniboss.rect.x = level.miniboss.position[0]  # Access the x coordinate
         level.miniboss.rect.y = level.miniboss.position[1]  # Access the y coordinate
+
+    # Assuming PowerUp is the class in powerups.py and it has the method check_collision_with_player
+    for power_up in power_ups:  # Assuming power_ups is a list of PowerUp instances
+        if power_up.check_collision_with_player(snake):  # Assuming snake has a position attribute
+            # Handle collision
+            power_up.apply_effect(snake)  # Apply the effect of the power-up
+            power_ups.remove(power_up)
 
     # Update the display
     pygame.display.flip()
@@ -197,8 +230,10 @@ while running:
             running = False
 
     # Check if the level is three and the miniboss has not been created yet
-    if level.level % 3 == 0:
+    if level.level % 3 == 0 and level.miniboss is None and not miniboss_spawned: 
+        scorpion_spawn_sound.play()
         level.miniboss = MiniBoss(SCREEN_WIDTH, SCREEN_HEIGHT)
+        miniboss_spawned = True
 
     # If the miniboss exists, update and draw it
     if level.miniboss is not None:
