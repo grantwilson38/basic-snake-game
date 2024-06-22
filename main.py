@@ -33,6 +33,7 @@ try:
     game_over_sound = pygame.mixer.Sound("game_over.wav")
     game_start_sound = pygame.mixer.Sound("game_start.wav")
     pellet_eat_sound = pygame.mixer.Sound("pellet_eat.wav")
+    miniboss_collision_sound = pygame.mixer.Sound("miniboss_collision.wav")  # Water Bottle Crush by MysteryPancake -- https://freesound.org/s/434453/ -- License: Attribution 4.0
 except pygame.error as e:
     print("Error loading sound files:", e)
     sys.exit()
@@ -150,12 +151,16 @@ while running:
         if not enemy_snake.alive:
             enemy_snakes.remove(enemy_snake)
 
+    # Update the mini boss's rect if the mini boss exists
+    if level.miniboss is not None:
+        level.miniboss.rect.x = level.miniboss.position[0]  # Access the x coordinate
+        level.miniboss.rect.y = level.miniboss.position[1]  # Access the y coordinate
+
     # Update the display
     pygame.display.flip()
 
     # Check if the player has run into the walls or collided with an enemy snake
-    if snake.check_collision(SCREEN_WIDTH, SCREEN_HEIGHT) or \
-       any(pygame.sprite.spritecollide(snake.head, enemy_snake.segments, False) for enemy_snake in enemy_snakes):
+    if snake.check_collision(SCREEN_WIDTH, SCREEN_HEIGHT) or any(pygame.sprite.spritecollide(snake.head, enemy_snake.segments, False) for enemy_snake in enemy_snakes):
         game_over_sound.play()
         player_lives -= 1  # Decrease player's lives by 1
         pygame.time.delay(4000)
@@ -164,6 +169,20 @@ while running:
         if running:
             snake.respawn_player()  # Respawn the player's snake away from all enemy snakes
             enemy_snakes = []  # Remove all enemy snakes from the screen
+
+    # Separate check for collision with the miniboss
+    if level.miniboss is not None and level.miniboss.rect.colliderect(snake.head.rect):
+        miniboss_collision_sound.play()
+        game_over_sound.play()
+        player_lives -= 2 
+        pygame.time.delay(4000)
+
+        # Check if the player has any lives left after miniboss collision
+        keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
+        if running:
+            snake.respawn_player() 
+            enemy_snakes = []
+            level.miniboss = None
 
     # Check if the player has run into the walls
     if snake.head.rect.left < 0 or snake.head.rect.right > SCREEN_WIDTH or \
@@ -178,12 +197,12 @@ while running:
             running = False
 
     # Check if the level is three and the miniboss has not been created yet
-    if level.level == 3 and level.miniboss is None:
-        level.miniboss = MiniBoss(SCREEN_HEIGHT)
+    if level.level % 3 == 0:
+        level.miniboss = MiniBoss(SCREEN_WIDTH, SCREEN_HEIGHT)
 
     # If the miniboss exists, update and draw it
     if level.miniboss is not None:
-        level.miniboss.update()
+        level.miniboss.update(snake.head.rect.center)
         level.miniboss.draw(screen)
         
         
