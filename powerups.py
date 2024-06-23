@@ -16,9 +16,9 @@ RIGHT = (MOVE_DISTANCE, 0)
 pygame.init()
 
 power_up_indices = {
-    "invincibility": 3,  # Index of invincibility power-up image in the sprite sheet
-    "size_increase": 3,  # Index for size increase
-    "score_multiplier": 3  # Index for score multiplier
+    "invincibility": 31,  # Index of invincibility power-up image in the sprite sheet
+    "size_increase": 26,  # Index for size increase
+    "score_multiplier": 49  # Index for score multiplier tilty sword
 }
 
 class PowerUp:
@@ -35,11 +35,10 @@ class PowerUp:
         self.rect = self.image.get_rect(center=position)
 
     def get_image(self, sprite_sheet):
-        # List of power-up types, expanded as needed
-        power_up_types = ["invincibility", "size_increase", "score_multiplier"]
-        index = power_up_types.index(self.type)
-        row = index // 7  # 7 power-ups per row given the new sheet width
-        col = index % 7 # 8 power-ups per column given the new sheet height
+        # Use the index from power_up_indices dictionary
+        index = power_up_indices[self.type]
+        row = index // 7  # Assuming 7 power-ups per row
+        col = index % 7  # Assuming the sprite sheet layout matches
 
         # Calculate the subsurface rectangle for the power-up
         x = col * 32
