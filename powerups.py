@@ -15,15 +15,22 @@ RIGHT = (MOVE_DISTANCE, 0)
 # Initialize Pygame
 pygame.init()
 
+power_up_indices = {
+    "invincibility": 3,  # Index of invincibility power-up image in the sprite sheet
+    "size_increase": 3,  # Index for size increase
+    "score_multiplier": 3  # Index for score multiplier
+}
+
 class PowerUp:
-    def __init__(self, type, position):
+    def __init__(self, type, position, sprite_sheet):
         super().__init__()
         self.type = type
         self.position = position
         self.visible = True  # Power-up is visible until picked up or duration ends
         self.active = True  # Power-up is active until picked up or duration ends
-        # Load the image
-        sprite_sheet = pygame.image.load(os.path.join("Images", "powerups.png")).convert_alpha()
+        # Load the sprite sheet once and use it for all instances
+        sprite_sheet_path = os.path.join("Images", "powerups.png")
+        sprite_sheet = pygame.image.load(sprite_sheet_path).convert_alpha()
         self.image = self.get_image(sprite_sheet)
         self.rect = self.image.get_rect(center=position)
 
@@ -32,7 +39,7 @@ class PowerUp:
         power_up_types = ["invincibility", "size_increase", "score_multiplier"]
         index = power_up_types.index(self.type)
         row = index // 7  # 7 power-ups per row given the new sheet width
-        col = index % 7
+        col = index % 7 # 8 power-ups per column given the new sheet height
 
         # Calculate the subsurface rectangle for the power-up
         x = col * 32
@@ -41,16 +48,9 @@ class PowerUp:
         return image
         
     def draw(self, screen):
-        if self.type == "invincibility":
-            color = (255, 255, 0)  # Yellow for invincibility
-        elif self.type == "size_increase":
-            color = (0, 0, 255)  # Blue for size increase
-        elif self.type == "score_multiplier":
-            color = (255, 0, 0)  # Red for score multiplier
-        else:
-            color = (255, 255, 255)  # Default color
-
-        pygame.draw.circle(screen, color, self.position, 10)  # Draw a circle for the power-up 
+        if self.visible:  # Only draw if the power-up is visible
+            image_rect = self.image.get_rect(center=self.position)
+            screen.blit(self.image, image_rect)
 
     def check_collision_with_player(self, snake):
         # Check collision with each segment of the snake
@@ -58,6 +58,7 @@ class PowerUp:
             if self.rect.colliderect(segment.rect):
                 power_up_sound = pygame.mixer.Sound(os.path.join("Sounds", "power_up.wav"))
                 power_up_sound.play()
+                self.visible = False  # Hide the power-up
                 return True
         return False
 

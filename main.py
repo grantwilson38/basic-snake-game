@@ -2,6 +2,7 @@ import pygame
 import random
 import sys
 import time
+import os
 
 from game_level import Level
 from snake import Snake
@@ -45,6 +46,10 @@ except pygame.error as e:
 # Create the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Snake Game")
+
+# Load the sprite sheet
+sprite_sheet_path = os.path.join("Images", "powerups.png")
+sprite_sheet = pygame.image.load(sprite_sheet_path).convert_alpha()
 
 # Create the game over screen
 game_over_screen = GameOverScreen(screen, font, 600, 600, "You Lost", (255, 0, 0), 5000)
@@ -126,7 +131,7 @@ while running:
             x = random.randint(0, SCREEN_WIDTH)
             y = random.randint(0, SCREEN_HEIGHT)
             power_up_type = random.choice(["invincibility", "size_increase", "score_multiplier"])
-            new_power_up = PowerUp(power_up_type, (x, y))
+            new_power_up = PowerUp(power_up_type, (x, y), sprite_sheet)
             power_ups.append(new_power_up)
     
     for power_up in power_ups:
