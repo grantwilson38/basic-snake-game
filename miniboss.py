@@ -1,6 +1,12 @@
 import pygame
 import random
 
+# Initialize Pygame
+pygame.init()
+
+# Load the sound files
+enemy_death = pygame.mixer.Sound("Sounds/enemy_death.mp3")
+
 class MiniBoss:
     def __init__(self, screen_width, screen_height):
         # Initialize the mini boss's attributes (position, size, speed, etc.)
@@ -8,6 +14,7 @@ class MiniBoss:
         self.speed = random.randint(3, 10)  # Random speed between 3 and 10
         self.size = (64, 64)  # Size of the miniboss
         self.frame = 0 # To keep track of the current frame
+        self.alive = True  # To keep track of whether the miniboss is alive or not
 
         self.rect = pygame.Rect(self.position[0], self.position[1], self.size[0], self.size[1])
 
@@ -30,30 +37,42 @@ class MiniBoss:
         self.size = self.image1.get_rect().size
 
     def draw(self, screen):
-        # Draw the mini boss on the screen
-        if self.frame % 4 == 0:
-            screen.blit(self.image1, self.position)
-        elif self.frame % 4 == 1:
-            screen.blit(self.image2, self.position)
-        elif self.frame % 4 == 2:
-            screen.blit(self.image3, self.position)
-        else:  # self.frame % 4 == 3
-            screen.blit(self.image4, self.position)
+        if not self.alive:
+            return
+        else:
+            # Draw the mini boss on the screen
+            if self.frame % 4 == 0:
+                screen.blit(self.image1, self.position)
+            elif self.frame % 4 == 1:
+                screen.blit(self.image2, self.position)
+            elif self.frame % 4 == 2:
+                screen.blit(self.image3, self.position)
+            else:  # self.frame % 4 == 3
+                screen.blit(self.image4, self.position)
 
-    def update(self, player_position):
-        # Calculate the direction vector from the miniboss to the player
-        dx = player_position[0] - self.position[0]
-        dy = player_position[1] - self.position[1]
-    
-        # Normalize the direction vector (make its length 1)
-        length = (dx**2 + dy**2)**0.5
-        if length > 0:  # Avoid division by zero
-            dx /= length
-            dy /= length
-    
-        # Update the miniboss's position
-        self.position[0] += dx * self.speed
-        self.position[1] += dy * self.speed
+    def update(self, player_position, playerSnake):
+        if not self.alive:
+            return
+        else:
+            # Calculate the direction vector from the miniboss to the player
+            dx = player_position[0] - self.position[0]
+            dy = player_position[1] - self.position[1]
+        
+            # Normalize the direction vector (make its length 1)
+            length = (dx**2 + dy**2)**0.5
+            if length > 0:  # Avoid division by zero
+                dx /= length
+                dy /= length
+        
+            # Update the miniboss's position
+            self.position[0] += dx * self.speed
+            self.position[1] += dy * self.speed
 
-        # Increment the frame
-        self.frame += 1
+            # Increment the frame
+            self.frame += 1
+
+            # Check for collision with the player snake if it's invincible
+            if playerSnake.invincible and self.rect.colliderect(playerSnake.head.rect):
+                self.alive = False
+                enemy_death.play()  # Play the death sound
+                

@@ -85,6 +85,13 @@ class EnemySnake(Snake):
                     enemy_death.play()  # Play death sound for this snake
                 break  # Exit the loop after handling collision
 
+        # Check for collision with playerSnake's body
+        for segment in self.player_snake.segments:
+            if self.head.rect.colliderect(segment.rect):
+                self.alive = False  # Mark the enemy snake as not alive
+                enemy_death.play()  # Play death sound for this snake
+                break  # Exit the loop as the enemy snake is now dead
+
         super().move()
 
     def add_segment(self, position, color):

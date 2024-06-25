@@ -4,6 +4,7 @@ import pygame
 from snake import Snake
 from score import Score
 
+
 MOVE_DISTANCE = 20
 SNAKE_SIZE = 10
 
@@ -56,7 +57,6 @@ class PowerUp:
         for segment in snake.segments:
             if self.rect.colliderect(segment.rect):
                 power_up_sound = pygame.mixer.Sound(os.path.join("Sounds", "power_up.wav"))
-                power_up_sound.play()
                 self.visible = False  # Hide the power-up
                 return True
         return False
@@ -64,9 +64,16 @@ class PowerUp:
     def apply_effect(self, playerSnake, currentScore):
         # Apply the effect based on the power-up type
         if self.type == "invincibility":
-            playerSnake.make_invincible()  # Make the snake invincible         
+            # Apply the effect based on the power-up type
+            if self.type == "invincibility":
+                playerSnake.make_invincible()  # Make the snake invincible
+                invincibility_sound = pygame.mixer.Sound(os.path.join("Sounds", "invincibility_sound.wav"))
+                invincibility_sound.play()
 
         elif self.type == "size_increase":
+            size_increase_sound = pygame.mixer.Sound(os.path.join("Sounds", "size_increase_sound.wav"))
+            size_increase_sound.play()
+
             # Add the first new segment
             last_segment = playerSnake.segments.sprites()[-1]
             if playerSnake.direction == UP:
@@ -92,6 +99,8 @@ class PowerUp:
             playerSnake.add_segment(new_position2, playerSnake.color)
 
         elif self.type == "score_multiplier":
+            score_multiplier_sound = pygame.mixer.Sound(os.path.join("Sounds", "score_multiplier_sound.wav"))
+            score_multiplier_sound.play()
             currentScore.double()
 
     def revert_effect(self, playerSnake):
