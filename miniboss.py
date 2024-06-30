@@ -11,7 +11,7 @@ class MiniBoss:
     def __init__(self, screen_width, screen_height):
         # Initialize the mini boss's attributes (position, size, speed, etc.)
         self.position = [random.randint(0, screen_width), screen_height]  # Start at the bottom of the screen
-        self.speed = random.randint(3, 10)  # Random speed between 3 and 10
+        self.speed = random.randint(3, 9)  # Random speed between 3 and 10
         self.size = (64, 64)  # Size of the miniboss
         self.frame = 0 # To keep track of the current frame
         self.alive = True  # To keep track of whether the miniboss is alive or not
@@ -82,6 +82,13 @@ class MiniBoss:
                     enemy_death.play()  # Play the death sound
 
                 else:
-                    # If the player is not invincible, the player dies
-                    print("Player was hit by miniboss!")
+                    # If the player is not invincible, the player loses lives
+                    print("Player is touching miniboss!")
                     return True
+            
+            # Check for collision with any part of the playerSnake
+            for segment in playerSnake.segments:
+                if self.rect.colliderect(segment.rect):
+                    self.alive = False
+                    enemy_death.play()  # Play the death sound
+                    break  # No need to check other segments once collision is found

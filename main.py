@@ -64,14 +64,14 @@ time.sleep(2)
 playerSnake = Snake()
 food = Food(RED, FOOD_SIZE, FOOD_SIZE)
 
-# Initialize player's lives
-player_lives = 3
-
 # Create a Level object
 level = Level()
 
 # Initialize the pellet counter
 pellet_counter = 0
+
+# Initialize the player's lives
+player_lives = 3
 
 # Create a clock object
 clock = pygame.time.Clock()
@@ -80,10 +80,7 @@ clock = pygame.time.Clock()
 currentScore = Score()
 
 # Create the enemy snakes list
-enemy_snakes = []  
-
-# Create list of minibosses
-minibosses = []
+enemy_snakes = []
 
 def check_game_over(player_lives):
     if player_lives <= 0:
@@ -219,8 +216,8 @@ while running:
                 enemy_snakes = []  # Remove all enemy snakes from the screen
     
     # Check collision with miniboss
-    for miniboss in minibosses[:]:
-        if miniboss.update(playerSnake.head.rect.center, playerSnake) == True:
+    if level.miniboss is not None:
+        if level.miniboss.update(playerSnake.head.rect.center, playerSnake) == True:
             miniboss_collision_sound.play()
             player_lives -= 2 
             pygame.time.delay(4000)
@@ -240,13 +237,12 @@ while running:
 
         playerSnake.respawn_player()  # Respawn the player's snake away from all enemy snakes
         enemy_snakes = []  # Remove all enemy snakes from the screen
-        minibosses = []
         
         if player_lives <= 0:
             running = False
 
     # Check if the level is three and the miniboss has not been created yet
-    if level.level % 3 == 0 and minibosses == []: 
+    if level.level % 3 == 0:
         level.miniboss = MiniBoss(SCREEN_WIDTH, SCREEN_HEIGHT)
         miniboss_spawned = True
 
@@ -256,10 +252,9 @@ while running:
         level.miniboss.draw(screen)
 
     # Inside your game loop, after updating each miniboss
-    for miniboss in minibosses[:]:  # Use a slice copy for safe removal during iteration
-        miniboss.update(playerSnake.head.rect.center, playerSnake)
-        if not miniboss.alive:
-            minibosses.remove(miniboss)  # Remove the miniboss from the list
+        level.miniboss.update(playerSnake.head.rect.center, playerSnake)
+        if not level.miniboss.alive:
+            level.miniboss = None
         
     # Render the player's lives on the screen after they have been updated
     lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
