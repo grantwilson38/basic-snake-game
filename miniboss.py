@@ -52,7 +52,7 @@ class MiniBoss:
 
     def update(self, player_position, playerSnake):
         if not self.alive:
-            return
+            return False
         else:
             # Calculate the direction vector from the miniboss to the player
             dx = player_position[0] - self.position[0]
@@ -71,8 +71,17 @@ class MiniBoss:
             # Increment the frame
             self.frame += 1
 
-            # Check for collision with the player snake if it's invincible
-            if playerSnake.invincible and self.rect.colliderect(playerSnake.head.rect):
-                self.alive = False
-                enemy_death.play()  # Play the death sound
-                
+            # Update the miniboss's rect position for accurate collision detection
+            self.rect.x = self.position[0]
+            self.rect.y = self.position[1]
+
+            # Check for collision with the player snake
+            if self.rect.colliderect(playerSnake.head.rect):
+                if playerSnake.invincible:
+                    self.alive = False
+                    enemy_death.play()  # Play the death sound
+
+                else:
+                    # If the player is not invincible, the player dies
+                    print("Player was hit by miniboss!")
+                    return True

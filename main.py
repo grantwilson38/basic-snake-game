@@ -218,29 +218,12 @@ while running:
                 playerSnake.respawn_player()  # Respawn the player's snake away from all enemy snakes
                 enemy_snakes = []  # Remove all enemy snakes from the screen
     
+    # Check collision with miniboss
     for miniboss in minibosses[:]:
-        if playerSnake.invincible:
-            pass # enemies can't collide with the player
-        else:
-            # Separate check for collision with the miniboss
-            if level.miniboss is not None and level.miniboss.rect.colliderect(playerSnake.head.rect):
-                miniboss_collision_sound.play()
-                # Separate check for collision with the miniboss
-                if level.miniboss is not None and level.miniboss.rect.colliderect(playerSnake.head.rect):
-                    miniboss_collision_sound.play()
-                    game_over_sound.play()
-                    player_lives -= 2 
-                    pygame.time.delay(4000)
-
-                    # Check if the player has any lives left after miniboss collision
-                    keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
-                    if running:
-                        playerSnake.respawn_player() 
-                        enemy_snakes = []
-                        level.miniboss = None
-                game_over_sound.play()
-                player_lives -= 2 
-                pygame.time.delay(4000)
+        if miniboss.update(playerSnake.head.rect.center, playerSnake) == True:
+            miniboss_collision_sound.play()
+            player_lives -= 2 
+            pygame.time.delay(4000)
 
             # Check if the player has any lives left after miniboss collision
             keep_playing, player_lives = play_again(screen, SCREEN_WIDTH, SCREEN_HEIGHT, player_lives)
@@ -264,7 +247,6 @@ while running:
 
     # Check if the level is three and the miniboss has not been created yet
     if level.level % 3 == 0 and minibosses == []: 
-        scorpion_spawn_sound.play()
         level.miniboss = MiniBoss(SCREEN_WIDTH, SCREEN_HEIGHT)
         miniboss_spawned = True
 
@@ -278,7 +260,6 @@ while running:
         miniboss.update(playerSnake.head.rect.center, playerSnake)
         if not miniboss.alive:
             minibosses.remove(miniboss)  # Remove the miniboss from the list
-        
         
     # Render the player's lives on the screen after they have been updated
     lives_surface = font.render(f"Lives: {player_lives}", True, (255, 255, 255))
