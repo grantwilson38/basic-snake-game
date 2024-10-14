@@ -18,6 +18,11 @@ from game_over_screen import GameOverScreen
 
 pygame.init()
 
+# Get the desktop size
+infoObject = pygame.display.Info()
+SCREEN_WIDTH = infoObject.current_w
+SCREEN_HEIGHT = infoObject.current_h
+
 # Create a font object
 font = pygame.font.Font(None, 36)
 
@@ -30,6 +35,57 @@ FOOD_SIZE = 10
 # Define the colors
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+WHITE = (255, 255, 255)
+
+#  Create a borderless window that fills the screen
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.NOFRAME)
+
+def show_opening_title_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK, WHITE):
+    pygame.init()  # Initialize all imported pygame modules
+    title_font = pygame.font.Font(None, 72)  # Create a font object for the title
+    instruction_font = pygame.font.Font(None, 48)  # Create a font object for the instructions
+
+    # Snake initialization
+    snake_pos = [[SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2]]
+    snake_length = 5
+    snake_direction = (20, 0)  # Move horizontally
+
+    # Main loop for the opening screen
+    waiting_for_input = True
+    while waiting_for_input:
+        screen.fill(BLACK)  # Clear the screen
+
+        # Update snake position
+        new_head = [snake_pos[0][0] + snake_direction[0], snake_pos[0][1] + snake_direction[1]]
+        # Handle screen edges
+        new_head[0] = new_head[0] % SCREEN_WIDTH
+        new_head[1] = new_head[1] % SCREEN_HEIGHT
+        snake_pos.insert(0, new_head)
+        if len(snake_pos) > snake_length:
+            snake_pos.pop()
+
+        # Draw snake
+        for segment in snake_pos:
+            pygame.draw.rect(screen, WHITE, pygame.Rect(segment[0], segment[1], 20, 20))
+
+        # Display the title and instruction
+        title_text = title_font.render("Snake Game", True, WHITE)
+        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, SCREEN_HEIGHT // 3))
+        instruction_text = instruction_font.render("PRESS SPACE TO BEGIN", True, WHITE)
+        screen.blit(instruction_text, (SCREEN_WIDTH // 2 - instruction_text.get_width() // 2, SCREEN_HEIGHT // 2))
+
+        pygame.display.flip()  # Update the display
+
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    waiting_for_input = False
+
+        time.sleep(0.1)  # Control the speed of the snake
+
+    screen.fill(BLACK)  # Clear the screen one last time before the game starts
+    pygame.display.flip()  # Update the display
 
 # Load sounds
 try:
@@ -53,6 +109,9 @@ sprite_sheet = pygame.image.load(sprite_sheet_path).convert_alpha()
 
 # Create the game over screen
 game_over_screen = GameOverScreen(screen, font, 600, 600, "You Lost", (255, 0, 0), 5000)
+
+# Show the opening title screen
+show_opening_title_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK, WHITE)
 
 # Play the game start sound
 game_start_sound.play()
@@ -92,7 +151,7 @@ def check_game_over(player_lives):
 running = True
 power_ups = [] # List to store active power-ups
 spawn_power_up_event = pygame.USEREVENT + 1
-pygame.time.set_timer(spawn_power_up_event, 3000)  # Spawn a power-up every 3 seconds
+pygame.time.set_timer(spawn_power_up_event, 10000)  # Spawn a power-up every few seconds
 
 while running:
 
@@ -165,11 +224,11 @@ while running:
                     enemy_snakes = []  # Remove all enemy snakes from the screen
 
     # Spawn a new enemy snake with a 3% chance
-    if random.randint(1, 100) <= 3:
+    if random.randint(1, 100) <= 5:
         color = (255, 0, 0)  # Red color
-        speed = random.randint(3, 5)
+        speed = random.randint(2, 8)
         behavior = random.choice(["chase_player", "chase_food", "random", "chase_enemy"])
-        size = random.randint(3, 5)
+        size = random.randint(3, 10)
 
         enemy_snake = EnemySnake(color, speed, playerSnake, behavior, size)
         enemy_snakes.append(enemy_snake)
