@@ -29,9 +29,8 @@ A simple Snake Game implemented in Python using the Turtle graphics library. The
 ## Game Rules
 
 1. The snake starts with a single segment.
-2. Eating food increases the snake's length and score.
-3. The game ends if the snake collides with the game boundaries.
-4. The game also ends if the snake collides with its own body.
+2. Eating food or powerups increases the snake's length and score.
+3. You lose a life every time the snake collides with its own body, the game boundaries, or an enemy.
 
 ## Customization
 
