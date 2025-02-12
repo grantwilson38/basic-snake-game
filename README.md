@@ -1,6 +1,6 @@
 # Snake Game
 
-A simple Snake Game implemented in Python using the Turtle graphics library. The game features a snake that grows longer as it consumes food, and the objective is to maximize the score without colliding with the game boundaries or the snake's own body.
+A simple Snake Game implemented in Python. The game features a snake that grows longer as it consumes food, and the objective is to maximize the score without colliding with the game boundaries or the snake's own body.
 
 ## Getting Started
 
