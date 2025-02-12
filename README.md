@@ -19,7 +19,7 @@ A simple Snake Game implemented in Python. The game features a snake that grows 
 3. Run the game by executing the Python script:
 
     ```bash
-    python snake_game.py
+    python main.py
     ```
 
 ## Game Controls
