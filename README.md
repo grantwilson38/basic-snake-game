@@ -7,7 +7,7 @@ A simple Snake Game implemented in Python using the Turtle graphics library. The
 1. Clone or download the repository to your local machine:
 
     ```bash
-    git clone https://github.com/your_username/your_repository.git
+    git clone https://github.com/grantwilson38/basic-snake-game.git
     ```
 
 2. Ensure you have Python and the required libraries installed. You can install the necessary libraries using:
